@@ -1,0 +1,17 @@
+{
+  "name": "@cozap/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Smart contracts Solidity — SBT de identidade Alumni Poli",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "typecheck": "tsc --noEmit",
+    "clean": "hardhat clean && rm -rf typechain-types"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0",
+    "typescript": "^5.5.0"
+  }
+}
