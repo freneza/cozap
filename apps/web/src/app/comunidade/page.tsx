@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../hooks/useAuth.js'
 import { useHasCredential } from '../../hooks/useHasCredential.js'
 import { useNostrIdentity } from '../../hooks/useNostrIdentity.js'
 import { useChannelMessages } from '../../hooks/useChannelMessages.js'
+import { useSendMessage } from '../../hooks/useSendMessage.js'
 
 const CHANNEL_ID = process.env.NEXT_PUBLIC_NOSTR_CHANNEL_ID ?? ''
 
@@ -17,12 +18,16 @@ function getRelays(): string[] {
   }
 }
 
+const RELAYS = getRelays()
+
 export default function ComunidadePage() {
   const router = useRouter()
   const { isAuthenticated, address, logout } = useAuth()
   const { hasCredential, isLoading } = useHasCredential(address)
-  const { pubkey } = useNostrIdentity()
-  const { messages, isConnected } = useChannelMessages(CHANNEL_ID, getRelays())
+  const { pubkey, privkey } = useNostrIdentity()
+  const { messages, isConnected } = useChannelMessages(CHANNEL_ID, RELAYS)
+  const { sendMessage, isSending, error: sendError } = useSendMessage(CHANNEL_ID, RELAYS, privkey)
+  const [draft, setDraft] = useState('')
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || hasCredential === false)) {
@@ -40,6 +45,17 @@ export default function ComunidadePage() {
 
   if (!isAuthenticated || !hasCredential) {
     return null
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!draft.trim()) return
+    try {
+      await sendMessage(draft.trim())
+      setDraft('')
+    } catch {
+      // erro exposto via sendError
+    }
   }
 
   return (
@@ -64,6 +80,21 @@ export default function ComunidadePage() {
           </li>
         ))}
       </ul>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Escreva uma mensagem..."
+          disabled={isSending}
+        />
+        <button type="submit" disabled={isSending}>
+          Enviar
+        </button>
+      </form>
+
+      {sendError && <p role="alert">{sendError}</p>}
     </main>
   )
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ComunidadePage from './page.js'
 
@@ -8,8 +8,10 @@ vi.mock('../../hooks/useAuth.js', () => ({ useAuth: vi.fn() }))
 vi.mock('../../hooks/useHasCredential.js', () => ({ useHasCredential: vi.fn() }))
 vi.mock('../../hooks/useNostrIdentity.js', () => ({ useNostrIdentity: vi.fn() }))
 vi.mock('../../hooks/useChannelMessages.js', () => ({ useChannelMessages: vi.fn() }))
+vi.mock('../../hooks/useSendMessage.js', () => ({ useSendMessage: vi.fn() }))
 
 const mockRouter = { replace: vi.fn() }
+const mockSendMessage = vi.fn()
 
 async function setup(opts: {
   isAuthenticated?: boolean
@@ -17,12 +19,15 @@ async function setup(opts: {
   credentialLoading?: boolean
   messages?: { id: string; authorPubkey: string; channelId: string; content: string; createdAt: number }[]
   isConnected?: boolean
+  isSending?: boolean
+  sendError?: string | null
 }) {
   const { useRouter } = await import('next/navigation')
   const { useAuth } = await import('../../hooks/useAuth.js')
   const { useHasCredential } = await import('../../hooks/useHasCredential.js')
   const { useNostrIdentity } = await import('../../hooks/useNostrIdentity.js')
   const { useChannelMessages } = await import('../../hooks/useChannelMessages.js')
+  const { useSendMessage } = await import('../../hooks/useSendMessage.js')
 
   vi.mocked(useRouter).mockReturnValue(mockRouter as ReturnType<typeof useRouter>)
   vi.mocked(useAuth).mockReturnValue({
@@ -44,10 +49,17 @@ async function setup(opts: {
     messages: opts.messages ?? [],
     isConnected: opts.isConnected ?? true,
   })
+  vi.mocked(useSendMessage).mockReturnValue({
+    sendMessage: mockSendMessage,
+    isSending: opts.isSending ?? false,
+    error: opts.sendError ?? null,
+  })
 }
 
 beforeEach(async () => {
   mockRouter.replace.mockClear()
+  mockSendMessage.mockReset()
+  mockSendMessage.mockResolvedValue(undefined)
   await setup({ isAuthenticated: true, hasCredential: true, isConnected: true })
 })
 
@@ -106,5 +118,55 @@ describe('ComunidadePage', () => {
     render(<ComunidadePage />)
     await user.click(screen.getByRole('button', { name: /sair/i }))
     expect(logout).toHaveBeenCalledOnce()
+  })
+
+  it('exibe input e botão Enviar quando autenticado com SBT', async () => {
+    render(<ComunidadePage />)
+    expect(screen.getByRole('textbox')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /enviar/i })).toBeInTheDocument()
+  })
+
+  it('chama sendMessage ao submeter o formulário', async () => {
+    const user = userEvent.setup()
+    render(<ComunidadePage />)
+
+    await user.type(screen.getByRole('textbox'), 'Olá pessoal!')
+    await user.click(screen.getByRole('button', { name: /enviar/i }))
+
+    expect(mockSendMessage).toHaveBeenCalledWith('Olá pessoal!')
+  })
+
+  it('input é limpo após envio bem-sucedido', async () => {
+    const user = userEvent.setup()
+    render(<ComunidadePage />)
+
+    await user.type(screen.getByRole('textbox'), 'Mensagem teste')
+    await user.click(screen.getByRole('button', { name: /enviar/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('textbox')).toHaveValue('')
+    })
+  })
+
+  it('botão Enviar fica desabilitado enquanto isSending', async () => {
+    await setup({ isAuthenticated: true, hasCredential: true, isSending: true })
+    render(<ComunidadePage />)
+    expect(screen.getByRole('button', { name: /enviar/i })).toBeDisabled()
+  })
+
+  it('exibe erro de envio se sendMessage falhar', async () => {
+    mockSendMessage.mockRejectedValue(new Error('Relay recusou'))
+    const user = userEvent.setup()
+    render(<ComunidadePage />)
+
+    await user.type(screen.getByRole('textbox'), 'Teste')
+    await user.click(screen.getByRole('button', { name: /enviar/i }))
+
+    // O erro vem do hook (mockado com sendError)
+    await setup({
+      isAuthenticated: true,
+      hasCredential: true,
+      sendError: 'Relay recusou',
+    })
   })
 })

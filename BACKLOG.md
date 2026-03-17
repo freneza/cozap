@@ -27,7 +27,7 @@ _Nenhuma tarefa em andamento._
 | US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `done` | M |
 | US-003 | Alumni acessa a plataforma com identidade verificada pelo SBT | 🔴 | `done` | G |
 | US-004 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `done` | G |
-| US-005 | Alumni envia mensagem em canal | 🟡 | `backlog` | M |
+| US-005 | Alumni envia mensagem em canal | 🟡 | `done` | M |
 | US-006 | Alumni explora canais temáticos e entra em um | 🟡 | `backlog` | M |
 | US-007 | Alumni visualiza perfil próprio com formações | 🟡 | `backlog` | M |
 | US-008 | Alumni atualiza dados do perfil off-chain | 🟢 | `backlog` | M |
@@ -104,3 +104,6 @@ _Nenhuma tarefa em andamento._
 - **2026-03-17**: US-004 concluída — `useNostrIdentity` (keypair gerado/persistido em
   localStorage), `useChannelMessages` (SimplePool, kind 42, canal geral), página
   `/comunidade` protegida por SBT com lista de mensagens. 55 testes web.
+- **2026-03-17**: US-005 concluída — `useSendMessage` assina evento kind 42 com
+  `finalizeEvent` e publica via `SimplePool.publish`. Formulário de envio na página
+  `/comunidade` com limpeza automática e exibição de erro. 65 testes web.
