@@ -12,13 +12,7 @@
 
 ## Em andamento
 
-| # | Tarefa | Status |
-|---|---|---|
-| US-002 | TASK-013 testes contrato | em execução |
-| US-002 | TASK-014 buildCredentialHash | em execução |
-| US-002 | TASK-015 API admin | aguardando |
-| US-002 | TASK-016 useAlumniSBT | aguardando |
-| US-002 | TASK-017 página admin | aguardando |
+_Nenhuma tarefa em andamento._
 
 ---
 
@@ -30,8 +24,8 @@
 | # | História | Prioridade | Status | Complexidade |
 |---|---|---|---|---|
 | US-001 | Alumni solicita emissão de credencial informando dados de formação | 🔴 | `done` | M |
-| US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `em andamento` | M |
-| US-003 | Alumni acessa a plataforma com identidade verificada pelo SBT | 🔴 | `refinando` | G |
+| US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `done` | M |
+| US-003 | Alumni acessa a plataforma com identidade verificada pelo SBT | 🔴 | `done` | G |
 | US-004 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `backlog` | G |
 | US-005 | Alumni envia mensagem em canal | 🟡 | `backlog` | M |
 | US-006 | Alumni explora canais temáticos e entra em um | 🟡 | `backlog` | M |
@@ -104,3 +98,6 @@
   Web3Auth usa MPC (chave nunca existe inteira em servidor), é open source e
   permite self-host. US-003 renomeada para refletir que o acesso pode ser por
   email/Google ou carteira própria.
+- **2026-03-17**: US-003 concluída — hook `useHasCredential` lê `hasCredential(address)`
+  on-chain via viem publicClient. Página inicial `/` tem 3 estados: não autenticado,
+  autenticado sem SBT (em análise), autenticado com SBT (boas-vindas). 39 testes web.
