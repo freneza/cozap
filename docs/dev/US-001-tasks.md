@@ -2,13 +2,14 @@
 
 > Refinado pelo Agente de Refinamento em 2026-03-17.
 > Decisão de identidade: ver ADR-001.
+> Provedor de embedded wallet: **Web3Auth** (MPC) — ver ADR-001.
 
 ## Fluxo
 
 ```
 Alumni abre /solicitar
   → escolhe: [Entrar com Google/email] ou [Conectar carteira]
-  → autentica (Privy cuida de ambos os caminhos)
+  → autentica (Web3Auth cuida de ambos os caminhos)
   → endereço Ethereum resolvido internamente
   → preenche: nome, curso, tipo diploma, ano entrada, ano conclusão
   → envia → solicitação salva como "pendente"
@@ -19,8 +20,9 @@ Alumni abre /solicitar
 
 - Solicitações armazenadas em **repositório em memória** atrás de interface
   `ICredentialRequestRepository` — substituível por banco de dados sem mudar lógica.
-- **Privy** (`@privy-io/react-auth`) gerencia ambos os caminhos de autenticação.
-  Privy já integra com wagmi internamente — não precisamos configurar wagmi separado.
+- **Web3Auth** (`@web3auth/modal-react-hooks`) gerencia ambos os caminhos de autenticação
+  via MPC. Caminho A (email/Google) cria embedded wallet. Caminho B conecta carteira
+  externa via adapter.
 - Hook `useAuth()` abstrai os dois caminhos. O resto do app nunca sabe qual foi usado.
 
 ---
@@ -95,16 +97,19 @@ buildCredentialRequest(data: CredentialRequestData, walletAddress: `0x${string}`
 ### TASK-009 — Configurar Web3Auth e hook `useAuth`
 
 **História origem:** US-001
-**Complexidade:** M
+**Complexidade:** G
 **Pacote(s):** `apps/web`
 
 **O que fazer:**
-1. Instalar `@web3auth/modal` e `@web3auth/base`
-2. Criar `src/lib/web3auth.ts` com configuração: clientId (variável de ambiente
-   `NEXT_PUBLIC_WEB3AUTH_CLIENT_ID`), loginMethods (`['email_passwordless', 'google']`),
-   chain Polygon Amoy (chainId 80002). Para o Caminho B, Web3Auth suporta
-   conexão com carteira externa via adapter `@web3auth/metamask-adapter`.
-3. Criar `src/app/providers.tsx` com `Web3AuthProvider` envolvendo os filhos
+1. Instalar `@web3auth/modal`, `@web3auth/base`, `@web3auth/modal-react-hooks`
+   e `@web3auth/ethereum-provider`
+2. Criar `src/lib/web3auth.ts` com configuração:
+   - `clientId` via `NEXT_PUBLIC_WEB3AUTH_CLIENT_ID`
+   - `web3AuthNetwork: 'sapphire_devnet'` (dev) / `'sapphire_mainnet'` (prod)
+   - Chain: Polygon Amoy (chainId 80002)
+   - Login methods: `EMAIL_PASSWORDLESS`, `GOOGLE`
+   - Adapter de carteira externa (`@web3auth/wallet-connect-v2-adapter`) para Caminho B
+3. Criar `src/app/providers.tsx` com `Web3AuthProvider` do `@web3auth/modal-react-hooks`
 4. Atualizar `src/app/layout.tsx` para usar `providers.tsx`
 5. Criar hook `src/hooks/useAuth.ts` que retorna:
    ```ts
@@ -116,8 +121,8 @@ buildCredentialRequest(data: CredentialRequestData, walletAddress: `0x${string}`
      logout: () => void
    }
    ```
-   Usa o SDK do Web3Auth internamente. Detecta o adapter ativo para
-   mapear `authMethod`.
+   Usa `useWeb3Auth` e `useWeb3AuthConnect` internamente.
+   Detecta o adapter ativo para mapear `authMethod`.
 
 **Testes esperados:**
 - [ ] `useAuth` retorna `isAuthenticated: false` quando não autenticado
@@ -149,17 +154,19 @@ buildCredentialRequest(data: CredentialRequestData, walletAddress: `0x${string}`
 **Depende de:** TASK-008
 
 **O que fazer:**
-Criar componente controlado `CredentialRequestForm` com campos:
+Criar componente controlado `CredentialRequestForm` com props:
+```ts
+{ address: `0x${string}`; onSubmit: (request: CredentialRequest) => void }
+```
+Campos:
 - Nome completo (text)
 - Curso de formação (text)
 - Tipo de diploma (select: Graduação / Mestrado / Doutorado)
 - Ano de entrada (number)
 - Ano de conclusão (number)
 
-Ao submeter: chama `buildCredentialRequest(formData, address)` e invoca
-callback `onSubmit(request: CredentialRequest)`.
-
-Exibe erros de validação inline (retornados por `buildCredentialRequest`).
+Ao submeter: chama `buildCredentialRequest(formData, address)` e invoca `onSubmit`.
+Exibe erros de validação inline (capturados do `InvalidRequestData`).
 Botão de submit desabilitado enquanto processando.
 
 **Testes esperados:**
@@ -173,6 +180,7 @@ Botão de submit desabilitado enquanto processando.
 - [ ] `pnpm typecheck` sem warnings
 - [ ] Componente é `'use client'`
 - [ ] Sem lógica de validação duplicada — delega tudo ao `buildCredentialRequest` do core
+- [ ] `address` recebido como prop (não acessa `useAuth` diretamente — responsabilidade da página)
 
 **Arquivos prováveis:**
 - `apps/web/src/components/CredentialRequestForm.tsx`
@@ -236,8 +244,8 @@ Criar `src/app/solicitar/page.tsx` com três estados visuais:
 
 1. **Não autenticado**: dois botões — "Entrar com email ou Google" e
    "Conectar carteira" — ambos chamam `login()` do `useAuth`
-   (Privy cuida de abrir o modal correto)
-2. **Autenticado**: exibe `CredentialRequestForm`
+   (Web3Auth cuida de abrir o modal correto para cada caminho)
+2. **Autenticado**: exibe `CredentialRequestForm` passando `address` do `useAuth` como prop
 3. **Solicitação enviada**: mensagem de confirmação com prazo estimado de resposta
 
 Ao submeter o form: faz `POST /api/credential-requests` com o `CredentialRequest`,
@@ -245,7 +253,7 @@ trata erros de rede.
 
 **Testes esperados:**
 - [ ] Exibe botões de autenticação quando não autenticado
-- [ ] Exibe formulário quando autenticado
+- [ ] Exibe formulário quando autenticado, com `address` passado como prop
 - [ ] Exibe confirmação após submit com sucesso
 - [ ] Exibe mensagem de erro se a API retornar erro
 
@@ -253,6 +261,7 @@ trata erros de rede.
 - [ ] `pnpm build` sem erros
 - [ ] `pnpm typecheck` sem warnings
 - [ ] Sem lógica de negócio na página — apenas composição
+- [ ] `address` obtido via `useAuth` e passado como prop ao form (não via contexto global)
 
 **Arquivos prováveis:**
 - `apps/web/src/app/solicitar/page.tsx`
@@ -265,7 +274,7 @@ trata erros de rede.
 ```
 TASK-007 (tipos CredentialRequest)
     ↓
-TASK-008 (buildCredentialRequest)    TASK-009 (Privy + useAuth)    TASK-011 (repositório + API)
+TASK-008 (buildCredentialRequest)    TASK-009 (Web3Auth + useAuth)    TASK-011 (repositório + API)
                          ↘                  ↙              ↘          ↙
                         TASK-010 (form)                  TASK-012 (página /solicitar)
 ```

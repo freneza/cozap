@@ -25,7 +25,7 @@ _(vazio)_
 |---|---|---|---|---|
 | US-001 | Alumni solicita emissão de credencial informando dados de formação | 🔴 | `refinando` | M |
 | US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `backlog` | M |
-| US-003 | Alumni verifica sua identidade conectando carteira Ethereum | 🔴 | `refinando` | G |
+| US-003 | Alumni acessa a plataforma com identidade verificada pelo SBT | 🔴 | `refinando` | G |
 | US-004 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `backlog` | G |
 | US-005 | Alumni envia mensagem em canal | 🟡 | `backlog` | M |
 | US-006 | Alumni explora canais temáticos e entra em um | 🟡 | `backlog` | M |
@@ -50,7 +50,7 @@ _(vazio)_
 
 > O endereço Ethereum **não é pedido ao alumni**. O sistema resolve o endereço
 > internamente pelo caminho de identidade escolhido (ver ADR-001):
-> - **Caminho A (padrão):** alumni faz login com email/Google → embedded wallet criada via Privy
+> - **Caminho A (padrão):** alumni faz login com email/Google → embedded wallet criada via Web3Auth (MPC)
 > - **Caminho B (avançado):** alumni conecta carteira própria (MetaMask, WalletConnect)
 
 **Fluxo:**
@@ -94,3 +94,7 @@ _(vazio)_
 - **2026-03-17**: ADR-001 registrado — estratégia de identidade com dois caminhos:
   embedded wallet (padrão) e carteira própria (avançado). Endereço Ethereum
   invisível ao alumni em ambos os casos.
+- **2026-03-17**: ADR-001 atualizado — Privy substituído por Web3Auth. Motivo:
+  Web3Auth usa MPC (chave nunca existe inteira em servidor), é open source e
+  permite self-host. US-003 renomeada para refletir que o acesso pode ser por
+  email/Google ou carteira própria.
