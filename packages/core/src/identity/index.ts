@@ -1,1 +1,1 @@
-export type { AlumniCredential, AlumniDegree, MemberProfile } from './types.js'
+export type { AlumniCredential, AlumniDegree, MemberProfile, CredentialRequest, CredentialRequestData } from './types.js'

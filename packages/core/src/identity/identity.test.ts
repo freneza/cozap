@@ -73,6 +73,6 @@ describe('MemberProfile', () => {
       updatedAt: 1700000000,
     }
     expect(profile.degrees).toHaveLength(3)
-    expect(profile.degrees[2].degreeType).toBe('doctorate')
+    expect(profile.degrees[2]?.degreeType).toBe('doctorate')
   })
 })

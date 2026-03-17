@@ -30,6 +30,29 @@ export interface AlumniCredential {
 }
 
 /**
+ * Dados preenchidos pelo alumni no formulário de solicitação de credencial.
+ */
+export interface CredentialRequestData {
+  fullName: string
+  course: string
+  degreeType: 'graduation' | 'masters' | 'doctorate'
+  entryYear: number
+  graduationYear: number
+}
+
+/**
+ * Solicitação completa de emissão de credencial, incluindo endereço
+ * Ethereum resolvido internamente pelo sistema (invisível ao alumni).
+ */
+export interface CredentialRequest {
+  id: string
+  walletAddress: `0x${string}`
+  status: 'pending' | 'approved' | 'rejected'
+  requestedAt: number
+  data: CredentialRequestData
+}
+
+/**
  * Perfil off-chain do membro, cujo hash fica registrado on-chain.
  * Dados dinâmicos que o próprio membro atualiza.
  */
