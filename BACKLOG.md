@@ -18,25 +18,79 @@ _(vazio)_
 
 ## Backlog priorizado
 
+> Ordenado pelo fluxo real de uso: um alumni só pode verificar sua identidade após
+> ter recebido o SBT, e só recebe o SBT após solicitar e ser aprovado por um admin.
+
 | # | História | Prioridade | Status | Complexidade |
 |---|---|---|---|---|
-| US-001 | Alumni verifica sua identidade conectando carteira Ethereum | 🔴 | `backlog` | G |
-| US-002 | Administrador emite SBT para alumni verificado | 🔴 | `backlog` | M |
-| US-003 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `backlog` | G |
-| US-004 | Alumni envia mensagem em canal | 🟡 | `backlog` | M |
-| US-005 | Alumni explora canais temáticos e entra em um | 🟡 | `backlog` | M |
-| US-006 | Alumni visualiza perfil próprio com formações | 🟡 | `backlog` | M |
-| US-007 | Alumni atualiza dados do perfil off-chain | 🟢 | `backlog` | M |
-| US-008 | Administrador adiciona outro administrador | 🟢 | `backlog` | P |
+| US-001 | Alumni solicita emissão de credencial informando dados de formação | 🔴 | `backlog` | M |
+| US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `backlog` | M |
+| US-003 | Alumni verifica sua identidade conectando carteira Ethereum | 🔴 | `refinando` | G |
+| US-004 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `backlog` | G |
+| US-005 | Alumni envia mensagem em canal | 🟡 | `backlog` | M |
+| US-006 | Alumni explora canais temáticos e entra em um | 🟡 | `backlog` | M |
+| US-007 | Alumni visualiza perfil próprio com formações | 🟡 | `backlog` | M |
+| US-008 | Alumni atualiza dados do perfil off-chain | 🟢 | `backlog` | M |
+| US-009 | Administrador adiciona outro administrador | 🟢 | `backlog` | P |
 
 ---
 
-## Done
+## Detalhamento de US-001
 
-_(vazio)_
+**Como** alumni egresso da Poli,
+**quero** solicitar minha credencial informando meus dados de formação,
+**para que** um administrador possa verificar e emitir meu SBT.
+
+**Dados informados pelo alumni:**
+- Nome completo
+- Curso de formação
+- Tipo de diploma (graduação / mestrado / doutorado)
+- Ano de entrada
+- Ano de conclusão
+
+> O endereço Ethereum **não é pedido ao alumni**. O sistema resolve o endereço
+> internamente pelo caminho de identidade escolhido (ver ADR-001):
+> - **Caminho A (padrão):** alumni faz login com email/Google → embedded wallet criada via Privy
+> - **Caminho B (avançado):** alumni conecta carteira própria (MetaMask, WalletConnect)
+
+**Fluxo:**
+1. Alumni escolhe como acessar: email/Google ou carteira própria
+2. Preenche formulário com dados de formação
+3. Solicitação fica pendente com o endereço já resolvido pelo sistema
+4. Administrador verifica os dados na base da Poli (manual por ora)
+5. Administrador pode checar redes sociais/contatos para confirmar identidade
+6. Administrador aprova → SBT é emitido (US-002)
+7. Alumni acessa a plataforma verificado (US-003)
+
+**Fora de escopo por ora:**
+- Integração automática com base de dados da Poli
+- Notificação ao alumni sobre aprovação/rejeição
+- Migração entre Caminho A e Caminho B
+
+---
+
+## Detalhamento de US-002
+
+**Como** administrador,
+**quero** revisar solicitações pendentes e aprovar ou rejeitar cada uma,
+**para que** apenas egressos legítimos da Poli recebam o SBT.
+
+**Fluxo:**
+1. Admin acessa painel de solicitações pendentes
+2. Visualiza dados da formação do solicitante
+3. Verifica manualmente na base da Poli
+4. Opcionalmente verifica identidade por redes sociais/contatos
+5. Aprova → transação on-chain emite o SBT (`issueCredential`)
+6. Rejeita → solicitação arquivada com motivo
 
 ---
 
 ## Notas de iteração
 
-_(o Orquestrador registra aqui o que foi aprendido em cada iteração)_
+- **2026-03-17**: Backlog reordenado para refletir fluxo real de uso. Adicionada
+  US-001 (solicitação de credencial) como pré-requisito de US-002 e US-003.
+  Arquivo `docs/dev/US-001-tasks.md` refere-se à antiga US-001 (agora US-003) —
+  será renomeado quando a implementação iniciar.
+- **2026-03-17**: ADR-001 registrado — estratégia de identidade com dois caminhos:
+  embedded wallet (padrão) e carteira própria (avançado). Endereço Ethereum
+  invisível ao alumni em ambos os casos.
