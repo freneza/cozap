@@ -26,7 +26,7 @@ _Nenhuma tarefa em andamento._
 | US-001 | Alumni solicita emissão de credencial informando dados de formação | 🔴 | `done` | M |
 | US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `done` | M |
 | US-003 | Alumni acessa a plataforma com identidade verificada pelo SBT | 🔴 | `done` | G |
-| US-004 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `backlog` | G |
+| US-004 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `done` | G |
 | US-005 | Alumni envia mensagem em canal | 🟡 | `backlog` | M |
 | US-006 | Alumni explora canais temáticos e entra em um | 🟡 | `backlog` | M |
 | US-007 | Alumni visualiza perfil próprio com formações | 🟡 | `backlog` | M |
@@ -101,3 +101,6 @@ _Nenhuma tarefa em andamento._
 - **2026-03-17**: US-003 concluída — hook `useHasCredential` lê `hasCredential(address)`
   on-chain via viem publicClient. Página inicial `/` tem 3 estados: não autenticado,
   autenticado sem SBT (em análise), autenticado com SBT (boas-vindas). 39 testes web.
+- **2026-03-17**: US-004 concluída — `useNostrIdentity` (keypair gerado/persistido em
+  localStorage), `useChannelMessages` (SimplePool, kind 42, canal geral), página
+  `/comunidade` protegida por SBT com lista de mensagens. 55 testes web.

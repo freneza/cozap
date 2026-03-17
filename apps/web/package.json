@@ -18,6 +18,7 @@
     "@web3auth/modal": "^9.7.0",
     "@web3auth/modal-react-hooks": "^9.7.0",
     "next": "^14.2.0",
+    "nostr-tools": "^2.7.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "viem": "^2.17.0"
