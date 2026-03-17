@@ -23,7 +23,7 @@ _(vazio)_
 
 | # | História | Prioridade | Status | Complexidade |
 |---|---|---|---|---|
-| US-001 | Alumni solicita emissão de credencial informando dados de formação | 🔴 | `backlog` | M |
+| US-001 | Alumni solicita emissão de credencial informando dados de formação | 🔴 | `refinando` | M |
 | US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `backlog` | M |
 | US-003 | Alumni verifica sua identidade conectando carteira Ethereum | 🔴 | `refinando` | G |
 | US-004 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `backlog` | G |
