@@ -50,6 +50,7 @@ export interface CredentialRequest {
   status: 'pending' | 'approved' | 'rejected'
   requestedAt: number
   data: CredentialRequestData
+  rejectionReason?: string
 }
 
 /**

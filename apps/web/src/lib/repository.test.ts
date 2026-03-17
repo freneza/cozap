@@ -53,4 +53,32 @@ describe('InMemoryCredentialRequestRepository', () => {
     const all = await repo.findAll()
     expect(all).toHaveLength(1)
   })
+
+  it('findAll filtra por status', async () => {
+    await repo.save(makeRequest({ id: 'a', status: 'pending' }))
+    await repo.save(makeRequest({ id: 'b', status: 'approved' }))
+    await repo.save(makeRequest({ id: 'c', status: 'rejected' }))
+
+    expect(await repo.findAll('pending')).toHaveLength(1)
+    expect(await repo.findAll('approved')).toHaveLength(1)
+    expect(await repo.findAll('rejected')).toHaveLength(1)
+  })
+
+  it('updateStatus atualiza para approved', async () => {
+    await repo.save(makeRequest({ id: 'x' }))
+    const updated = await repo.updateStatus('x', 'approved')
+    expect(updated?.status).toBe('approved')
+  })
+
+  it('updateStatus atualiza para rejected com motivo', async () => {
+    await repo.save(makeRequest({ id: 'x' }))
+    const updated = await repo.updateStatus('x', 'rejected', 'Não encontrado na base')
+    expect(updated?.status).toBe('rejected')
+    expect(updated?.rejectionReason).toBe('Não encontrado na base')
+  })
+
+  it('updateStatus retorna null para id inexistente', async () => {
+    const result = await repo.updateStatus('inexistente', 'approved')
+    expect(result).toBeNull()
+  })
 })

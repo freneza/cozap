@@ -12,7 +12,13 @@
 
 ## Em andamento
 
-_(vazio)_
+| # | Tarefa | Status |
+|---|---|---|
+| US-002 | TASK-013 testes contrato | em execução |
+| US-002 | TASK-014 buildCredentialHash | em execução |
+| US-002 | TASK-015 API admin | aguardando |
+| US-002 | TASK-016 useAlumniSBT | aguardando |
+| US-002 | TASK-017 página admin | aguardando |
 
 ---
 
@@ -23,8 +29,8 @@ _(vazio)_
 
 | # | História | Prioridade | Status | Complexidade |
 |---|---|---|---|---|
-| US-001 | Alumni solicita emissão de credencial informando dados de formação | 🔴 | `refinando` | M |
-| US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `backlog` | M |
+| US-001 | Alumni solicita emissão de credencial informando dados de formação | 🔴 | `done` | M |
+| US-002 | Administrador revisa solicitação e emite SBT para alumni verificado | 🔴 | `em andamento` | M |
 | US-003 | Alumni acessa a plataforma com identidade verificada pelo SBT | 🔴 | `refinando` | G |
 | US-004 | Alumni acessa canal geral da comunidade após verificação | 🔴 | `backlog` | G |
 | US-005 | Alumni envia mensagem em canal | 🟡 | `backlog` | M |

@@ -30,15 +30,34 @@ describe('AlumniSBT', function () {
   })
 
   describe('addAdmin / removeAdmin', function () {
-    it('owner pode adicionar admin', async function () {
-      await contract.addAdmin(admin.address)
+    it('owner pode adicionar admin e emite AdminAdded', async function () {
+      await expect(contract.addAdmin(admin.address))
+        .to.emit(contract, 'AdminAdded')
+        .withArgs(admin.address)
       expect(await contract.admins(admin.address)).to.be.true
     })
 
-    it('owner pode remover admin', async function () {
+    it('admin recém-adicionado pode emitir SBT', async function () {
+      await contract.addAdmin(admin.address)
+      await expect(
+        contract.connect(admin).issueCredential(member.address, credentialHash),
+      ).to.emit(contract, 'CredentialIssued')
+    })
+
+    it('owner pode remover admin e emite AdminRemoved', async function () {
+      await contract.addAdmin(admin.address)
+      await expect(contract.removeAdmin(admin.address))
+        .to.emit(contract, 'AdminRemoved')
+        .withArgs(admin.address)
+      expect(await contract.admins(admin.address)).to.be.false
+    })
+
+    it('admin removido não pode mais emitir SBT', async function () {
       await contract.addAdmin(admin.address)
       await contract.removeAdmin(admin.address)
-      expect(await contract.admins(admin.address)).to.be.false
+      await expect(
+        contract.connect(admin).issueCredential(member.address, credentialHash),
+      ).to.be.revertedWithCustomError(contract, 'NotAdmin')
     })
 
     it('não-owner não pode adicionar admin', async function () {

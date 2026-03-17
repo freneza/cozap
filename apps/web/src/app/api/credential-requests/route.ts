@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { CredentialRequest } from '@cozap/core'
 import { getRepository } from '../../../lib/repository.js'
 
+export async function GET(request: NextRequest) {
+  const status = request.nextUrl.searchParams.get('status') as CredentialRequest['status'] | null
+  const validStatuses: CredentialRequest['status'][] = ['pending', 'approved', 'rejected']
+
+  if (status && !validStatuses.includes(status)) {
+    return NextResponse.json({ error: 'Status inválido' }, { status: 400 })
+  }
+
+  const requests = await getRepository().findAll(status ?? undefined)
+  return NextResponse.json(requests)
+}
+
 export async function POST(request: NextRequest) {
   let body: unknown
 
