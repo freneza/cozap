@@ -5,7 +5,7 @@
   "description": "Plataforma de comunicação descentralizada para comunidade Alumni Poli",
   "packageManager": "pnpm@9.15.4",
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=22.0.0",
     "pnpm": ">=9.15.0"
   },
   "scripts": {
@@ -17,8 +17,8 @@
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
-    "typescript": "^5.5.0",
-    "prettier": "^3.3.0"
+    "prettier": "^3.3.0",
+    "turbo": "^2.8.20",
+    "typescript": "^5.5.0"
   }
 }
