@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import * as nostrTools from 'nostr-tools'
-import { useNostrIdentity } from './useNostrIdentity.js'
+import { useNostrIdentity } from './useNostrIdentity'
 
 vi.mock('nostr-tools', async (importOriginal) => {
   const actual = await importOriginal<typeof import('nostr-tools')>()

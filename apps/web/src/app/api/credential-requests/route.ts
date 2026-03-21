@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { CredentialRequest } from '@cozap/core'
-import { getRepository } from '../../../lib/repository.js'
+import { getRepository } from '../../../lib/repository'
 
 export async function GET(request: NextRequest) {
   const status = request.nextUrl.searchParams.get('status') as CredentialRequest['status'] | null

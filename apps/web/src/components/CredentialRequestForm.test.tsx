@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { CredentialRequestForm } from './CredentialRequestForm.js'
+import { CredentialRequestForm } from './CredentialRequestForm'
 import { CredentialRequest } from '@cozap/core'
 
 const address = '0xAbCd1234AbCd1234AbCd1234AbCd1234AbCd1234' as `0x${string}`

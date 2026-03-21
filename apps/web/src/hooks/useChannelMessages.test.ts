@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { SimplePool } from 'nostr-tools'
-import { useChannelMessages } from './useChannelMessages.js'
+import { useChannelMessages } from './useChannelMessages'
 
 vi.mock('nostr-tools', async (importOriginal) => {
   const actual = await importOriginal<typeof import('nostr-tools')>()

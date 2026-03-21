@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useWeb3Auth } from '@web3auth/modal-react-hooks'
 import { createWalletClient } from 'viem'
-import { useAlumniSBT } from './useAlumniSBT.js'
+import { useAlumniSBT } from './useAlumniSBT'
 
 vi.mock('@web3auth/modal-react-hooks', () => ({
   useWeb3Auth: vi.fn(),

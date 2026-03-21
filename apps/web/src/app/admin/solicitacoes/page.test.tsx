@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import SolicitacoesPage from './page.js'
+import SolicitacoesPage from './page'
 import { CredentialRequest } from '@cozap/core'
 
 vi.mock('../../../hooks/useAlumniSBT.js', () => ({

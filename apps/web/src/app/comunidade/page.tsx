@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '../../hooks/useAuth.js'
-import { useHasCredential } from '../../hooks/useHasCredential.js'
-import { useNostrIdentity } from '../../hooks/useNostrIdentity.js'
-import { useChannelMessages } from '../../hooks/useChannelMessages.js'
-import { useSendMessage } from '../../hooks/useSendMessage.js'
+import { useAuth } from '../../hooks/useAuth'
+import { useHasCredential } from '../../hooks/useHasCredential'
+import { useNostrIdentity } from '../../hooks/useNostrIdentity'
+import { useChannelMessages } from '../../hooks/useChannelMessages'
+import { useSendMessage } from '../../hooks/useSendMessage'
 
 const CHANNEL_ID = process.env.NEXT_PUBLIC_NOSTR_CHANNEL_ID ?? ''
 

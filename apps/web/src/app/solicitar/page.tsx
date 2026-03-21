@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { CredentialRequest } from '@cozap/core'
-import { useAuth } from '../../hooks/useAuth.js'
-import { CredentialRequestForm } from '../../components/CredentialRequestForm.js'
+import { useAuth } from '../../hooks/useAuth'
+import { CredentialRequestForm } from '../../components/CredentialRequestForm'
 
 type PageState = 'auth' | 'form' | 'success'
 

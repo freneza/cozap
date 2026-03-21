@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { InMemoryCredentialRequestRepository } from './repository.js'
+import { InMemoryCredentialRequestRepository } from './repository'
 import { CredentialRequest } from '@cozap/core'
 
 const makeRequest = (overrides?: Partial<CredentialRequest>): CredentialRequest => ({

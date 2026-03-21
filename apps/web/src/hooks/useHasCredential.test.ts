@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { createPublicClient } from 'viem'
-import { useHasCredential } from './useHasCredential.js'
+import { useHasCredential } from './useHasCredential'
 
 vi.mock('viem', async (importOriginal) => {
   const actual = await importOriginal<typeof import('viem')>()

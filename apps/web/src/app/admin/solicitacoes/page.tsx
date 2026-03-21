@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { CredentialRequest } from '@cozap/core'
 import { buildCredentialHash } from '@cozap/core'
-import { useAlumniSBT } from '../../../hooks/useAlumniSBT.js'
+import { useAlumniSBT } from '../../../hooks/useAlumniSBT'
 
 type ItemState = { rejectMode: boolean; error: string | null; loading: boolean }
 

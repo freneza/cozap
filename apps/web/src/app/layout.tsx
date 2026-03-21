@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Providers } from './providers.js'
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: 'coZap — Alumni Poli',

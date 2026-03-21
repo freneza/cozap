@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useAuth } from '../hooks/useAuth.js'
-import { useHasCredential } from '../hooks/useHasCredential.js'
+import { useAuth } from '../hooks/useAuth'
+import { useHasCredential } from '../hooks/useHasCredential'
 
 export default function HomePage() {
   const { isAuthenticated, address, login, logout } = useAuth()

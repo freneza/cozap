@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getRepository } from '../../../../lib/repository.js'
+import { getRepository } from '../../../../lib/repository'
 
 type PatchBody = {
   action: 'approve' | 'reject'
