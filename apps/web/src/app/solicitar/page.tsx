@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import { CredentialRequest } from '@cozap/core'
 import { useAuth } from '../../hooks/useAuth'
@@ -34,31 +35,93 @@ export default function SolicitarPage() {
     setPageState('success')
   }
 
+  const header = (
+    <header className="site-header">
+      <div className="container site-header__inner">
+        <Link href="/" className="site-header__brand">
+          <div className="site-header__logo">M</div>
+          <div>
+            <div className="site-header__title">coZap</div>
+            <div className="site-header__subtitle">Alumni Poli</div>
+          </div>
+        </Link>
+      </div>
+    </header>
+  )
+
   if (pageState === 'success') {
     return (
-      <main>
-        <h1>Solicitação enviada</h1>
-        <p>Sua solicitação foi recebida. Retornaremos em breve com a confirmação.</p>
-      </main>
+      <>
+        {header}
+        <main className="page-main">
+          <div className="container container--narrow text-center">
+            <div className="card card--elevated">
+              <div className="badge badge--verified mb-4" style={{ margin: '0 auto var(--space-4)' }}>
+                ✓ Enviado
+              </div>
+              <h2 style={{ marginBottom: 'var(--space-3)' }}>Solicitação recebida</h2>
+              <p className="text-muted">
+                Sua solicitação foi enviada com sucesso. Um administrador irá verificar seus dados
+                e você receberá a confirmação em breve.
+              </p>
+              <hr className="divider" />
+              <Link href="/" className="btn btn--outline">
+                Voltar ao início
+              </Link>
+            </div>
+          </div>
+        </main>
+      </>
     )
   }
 
   if (pageState === 'form' && address) {
     return (
-      <main>
-        <h1>Solicitar credencial Alumni Poli</h1>
-        {apiError && <p role="alert">{apiError}</p>}
-        <CredentialRequestForm address={address} onSubmit={handleSubmit} />
-      </main>
+      <>
+        {header}
+        <main className="page-main">
+          <div className="container container--narrow">
+            <div className="card card--elevated">
+              <div className="card__header">
+                <h2 className="card__title">Solicitar credencial Alumni Poli</h2>
+                <p className="card__subtitle">
+                  Preencha seus dados de formação para solicitar sua credencial verificada.
+                </p>
+              </div>
+              {apiError && (
+                <div className="alert alert--error mb-6" role="alert">
+                  {apiError}
+                </div>
+              )}
+              <CredentialRequestForm address={address} onSubmit={handleSubmit} />
+            </div>
+          </div>
+        </main>
+      </>
     )
   }
 
   return (
-    <main>
-      <h1>Solicitar credencial Alumni Poli</h1>
-      <p>Para continuar, identifique-se:</p>
-      <button onClick={login}>Entrar com email ou Google</button>
-      <button onClick={login}>Conectar carteira</button>
-    </main>
+    <>
+      {header}
+      <main className="page-main">
+        <div className="container container--narrow text-center">
+          <div className="card card--elevated">
+            <h2 style={{ marginBottom: 'var(--space-3)' }}>Solicitar credencial Alumni Poli</h2>
+            <p className="text-muted" style={{ marginBottom: 'var(--space-6)' }}>
+              Para continuar, identifique-se com sua conta:
+            </p>
+            <div className="flex flex-col gap-3">
+              <button className="btn btn--primary btn--lg btn--full" onClick={login}>
+                Entrar com email ou Google
+              </button>
+              <button className="btn btn--outline btn--lg btn--full" onClick={login}>
+                Conectar carteira
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </>
   )
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { CredentialRequest } from '@cozap/core'
 import { buildCredentialHash } from '@cozap/core'
@@ -56,50 +57,128 @@ export default function SolicitacoesPage() {
     }
   }
 
+  const degreeLabel: Record<string, string> = {
+    graduation: 'Graduação',
+    masters: 'Mestrado',
+    doctorate: 'Doutorado',
+  }
+
   return (
-    <main>
-      <h1>Solicitações pendentes</h1>
-      {requests.length === 0 && <p>Nenhuma solicitação pendente.</p>}
-      <ul>
-        {requests.map((req) => {
-          const state = itemState[req.id]
-          return (
-            <li key={req.id}>
-              <strong>{req.data.fullName}</strong> — {req.data.course} ({req.data.degreeType}){' '}
-              {req.data.entryYear}–{req.data.graduationYear}
-              <br />
-              <small>{req.walletAddress}</small>
+    <>
+      <header className="site-header">
+        <div className="container site-header__inner">
+          <Link href="/" className="site-header__brand">
+            <div className="site-header__logo">M</div>
+            <div>
+              <div className="site-header__title">coZap</div>
+              <div className="site-header__subtitle">Alumni Poli</div>
+            </div>
+          </Link>
+          <nav className="site-header__nav">
+            <span style={{ color: 'var(--color-gold-light)', fontSize: 'var(--text-sm)' }}>
+              Painel Admin
+            </span>
+          </nav>
+        </div>
+      </header>
 
-              {state?.error && <p role="alert">{state.error}</p>}
+      <main className="page-main">
+        <div className="container">
+          <div style={{ marginBottom: 'var(--space-8)' }}>
+            <h1 style={{ marginBottom: 'var(--space-2)' }}>Solicitações pendentes</h1>
+            <p className="text-muted">
+              Revise os dados de formação e verifique na base da Poli antes de aprovar.
+            </p>
+          </div>
 
-              {!state?.rejectMode ? (
-                <>
-                  <button onClick={() => handleApprove(req)} disabled={state?.loading}>
-                    Aprovar
-                  </button>
-                  <button onClick={() => setItem(req.id, { rejectMode: true })} disabled={state?.loading}>
-                    Rejeitar
-                  </button>
-                </>
-              ) : (
-                <>
-                  <input
-                    placeholder="Motivo da rejeição"
-                    value={rejectReasons[req.id] ?? ''}
-                    onChange={(e) => setRejectReasons((prev) => ({ ...prev, [req.id]: e.target.value }))}
-                  />
-                  <button onClick={() => handleReject(req)} disabled={state?.loading}>
-                    Confirmar rejeição
-                  </button>
-                  <button onClick={() => setItem(req.id, { rejectMode: false })} disabled={state?.loading}>
-                    Cancelar
-                  </button>
-                </>
-              )}
-            </li>
-          )
-        })}
-      </ul>
-    </main>
+          {requests.length === 0 && (
+            <div className="card text-center" style={{ padding: 'var(--space-12)' }}>
+              <p className="text-muted">Nenhuma solicitação pendente no momento.</p>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            {requests.map((req) => {
+              const state = itemState[req.id]
+              return (
+                <div className="card" key={req.id}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
+                    <div>
+                      <h3 style={{ marginBottom: 'var(--space-1)' }}>{req.data.fullName}</h3>
+                      <p className="text-muted" style={{ marginBottom: 'var(--space-2)' }}>
+                        {req.data.course} · {degreeLabel[req.data.degreeType] ?? req.data.degreeType} · {req.data.entryYear}–{req.data.graduationYear}
+                      </p>
+                      <code style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)', wordBreak: 'break-all' }}>
+                        {req.walletAddress}
+                      </code>
+                    </div>
+
+                    <span className="badge badge--pending">Pendente</span>
+                  </div>
+
+                  {state?.error && (
+                    <div className="alert alert--error mt-4" role="alert">
+                      {state.error}
+                    </div>
+                  )}
+
+                  <hr className="divider" style={{ margin: 'var(--space-4) 0' }} />
+
+                  {!state?.rejectMode ? (
+                    <div className="flex gap-3">
+                      <button
+                        className="btn btn--primary"
+                        onClick={() => handleApprove(req)}
+                        disabled={state?.loading}
+                      >
+                        {state?.loading ? 'Processando…' : '✓ Aprovar'}
+                      </button>
+                      <button
+                        className="btn btn--danger"
+                        onClick={() => setItem(req.id, { rejectMode: true })}
+                        disabled={state?.loading}
+                      >
+                        Rejeitar
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label" htmlFor={`reason-${req.id}`}>
+                          Motivo da rejeição
+                        </label>
+                        <input
+                          className="form-input"
+                          id={`reason-${req.id}`}
+                          placeholder="Descreva o motivo da rejeição"
+                          value={rejectReasons[req.id] ?? ''}
+                          onChange={(e) => setRejectReasons((prev) => ({ ...prev, [req.id]: e.target.value }))}
+                        />
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          className="btn btn--danger"
+                          onClick={() => handleReject(req)}
+                          disabled={state?.loading}
+                        >
+                          {state?.loading ? 'Processando…' : 'Confirmar rejeição'}
+                        </button>
+                        <button
+                          className="btn btn--ghost"
+                          onClick={() => setItem(req.id, { rejectMode: false })}
+                          disabled={state?.loading}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </main>
+    </>
   )
 }

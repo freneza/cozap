@@ -91,7 +91,7 @@ describe('SolicitarPage', () => {
     await user.click(screen.getByRole('button', { name: 'mock-form-submit' }))
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: /solicitação enviada/i })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: /solicitação recebida/i })).toBeInTheDocument()
     })
   })
 

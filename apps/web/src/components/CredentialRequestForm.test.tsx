@@ -71,6 +71,6 @@ describe('CredentialRequestForm', () => {
     await user.type(screen.getByLabelText('Ano de conclusão'), '2020')
     await user.click(screen.getByRole('button', { name: 'Enviar solicitação' }))
 
-    expect(screen.getByRole('button', { name: 'Enviar solicitação' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Enviando…' })).toBeDisabled()
   })
 })

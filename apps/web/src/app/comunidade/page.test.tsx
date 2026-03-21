@@ -151,7 +151,7 @@ describe('ComunidadePage', () => {
   it('botão Enviar fica desabilitado enquanto isSending', async () => {
     await setup({ isAuthenticated: true, hasCredential: true, isSending: true })
     render(<ComunidadePage />)
-    expect(screen.getByRole('button', { name: /enviar/i })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /enviando/i })).toBeDisabled()
   })
 
   it('exibe erro de envio se sendMessage falhar', async () => {

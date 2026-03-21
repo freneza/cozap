@@ -46,29 +46,34 @@ export function CredentialRequestForm({ address, onSubmit }: Props) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor="fullName">Nome completo</label>
+      <div className="form-group">
+        <label className="form-label" htmlFor="fullName">Nome completo</label>
         <input
+          className="form-input"
           id="fullName"
           type="text"
+          placeholder="Ex: João da Silva"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
         />
       </div>
 
-      <div>
-        <label htmlFor="course">Curso de formação</label>
+      <div className="form-group">
+        <label className="form-label" htmlFor="course">Curso de formação</label>
         <input
+          className="form-input"
           id="course"
           type="text"
+          placeholder="Ex: Engenharia Elétrica"
           value={course}
           onChange={(e) => setCourse(e.target.value)}
         />
       </div>
 
-      <div>
-        <label htmlFor="degreeType">Tipo de diploma</label>
+      <div className="form-group">
+        <label className="form-label" htmlFor="degreeType">Tipo de diploma</label>
         <select
+          className="form-select"
           id="degreeType"
           value={degreeType}
           onChange={(e) => setDegreeType(e.target.value as typeof degreeType)}
@@ -79,30 +84,40 @@ export function CredentialRequestForm({ address, onSubmit }: Props) {
         </select>
       </div>
 
-      <div>
-        <label htmlFor="entryYear">Ano de entrada</label>
-        <input
-          id="entryYear"
-          type="number"
-          value={entryYear}
-          onChange={(e) => setEntryYear(e.target.value)}
-        />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+        <div className="form-group">
+          <label className="form-label" htmlFor="entryYear">Ano de entrada</label>
+          <input
+            className="form-input"
+            id="entryYear"
+            type="number"
+            placeholder="Ex: 2010"
+            value={entryYear}
+            onChange={(e) => setEntryYear(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label" htmlFor="graduationYear">Ano de conclusão</label>
+          <input
+            className="form-input"
+            id="graduationYear"
+            type="number"
+            placeholder="Ex: 2015"
+            value={graduationYear}
+            onChange={(e) => setGraduationYear(e.target.value)}
+          />
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="graduationYear">Ano de conclusão</label>
-        <input
-          id="graduationYear"
-          type="number"
-          value={graduationYear}
-          onChange={(e) => setGraduationYear(e.target.value)}
-        />
-      </div>
+      {error && (
+        <div className="alert alert--error mb-6" role="alert">
+          {error}
+        </div>
+      )}
 
-      {error && <p role="alert">{error}</p>}
-
-      <button type="submit" disabled={submitting}>
-        Enviar solicitação
+      <button className="btn btn--primary btn--full btn--lg" type="submit" disabled={submitting}>
+        {submitting ? 'Enviando…' : 'Enviar solicitação'}
       </button>
     </form>
   )
