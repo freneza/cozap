@@ -18,6 +18,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: 'coZap — Alumni Poli',
   description: 'Plataforma de comunicação da comunidade Alumni Poli',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

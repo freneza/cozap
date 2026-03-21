@@ -84,7 +84,7 @@ export function CredentialRequestForm({ address, onSubmit }: Props) {
         </select>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+      <div className="grid-2col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
         <div className="form-group">
           <label className="form-label" htmlFor="entryYear">Ano de entrada</label>
           <input
