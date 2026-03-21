@@ -32,23 +32,15 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        // Claude Code
         "anthropic.claude-code",
-
-        // TypeScript / JavaScript
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "ms-vscode.vscode-typescript-next",
-
-        // Solidity / Web3
         "NomicFoundation.hardhat-solidity",
-
-        // Git
         "eamodio.gitlens",
-
-        // Qualidade de código
         "streetsidesoftware.code-spell-checker",
-        "streetsidesoftware.code-spell-checker-portuguese-brazilian"
+        "streetsidesoftware.code-spell-checker-portuguese-brazilian",
+        "bierner.markdown-mermaid"
       ],
       "settings": {
         "editor.formatOnSave": true,

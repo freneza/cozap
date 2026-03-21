@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # pnpm via corepack (já incluso no Node 20)
-RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 # Claude Code CLI
 RUN npm install -g @anthropic-ai/claude-code
