@@ -61,14 +61,14 @@ Interface web construída com Next.js.
 
 ## Ambiente de desenvolvimento
 
-O projeto inclui um **devcontainer** com Node.js 20, pnpm, Claude Code CLI e todas as extensões do VS Code pré-configuradas. Basta abrir a pasta no VS Code e clicar em _Reopen in Container_.
+O projeto inclui um **devcontainer** com Node.js 22, pnpm 9.15.4, Claude Code CLI e todas as extensões do VS Code pré-configuradas. Basta abrir a pasta no VS Code e clicar em _Reopen in Container_.
 
 Consulte [docs/dev/DEV.md](docs/dev/DEV.md) para instruções detalhadas.
 
 ## Requisitos (sem devcontainer)
 
-- Node.js >= 20
-- pnpm >= 9
+- Node.js >= 22
+- pnpm >= 9.15
 
 ## Instalação
 

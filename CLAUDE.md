@@ -18,7 +18,7 @@ Este projeto é desenvolvido com **Extreme Programming (XP)**:
 
 | Camada | Tecnologia |
 |---|---|
-| Frontend | Next.js 14 + React 18 |
+| Frontend | Next.js 16 + React 19 |
 | Contratos | Solidity 0.8.27 + Hardhat |
 | Protocolo de mensagens | Nostr (`nostr-tools`) |
 | Blockchain alvo | Polygon (testnet: Amoy) |

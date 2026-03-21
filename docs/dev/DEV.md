@@ -17,8 +17,8 @@ O projeto usa [Dev Containers](https://containers.dev) para garantir um ambiente
 
 | Componente | Versão |
 |---|---|
-| Node.js | 20 (Debian Bookworm slim) |
-| pnpm | 9.0.0 |
+| Node.js | 22 (Debian Bookworm slim) |
+| pnpm | 9.15.4 |
 | Claude Code CLI | última disponível |
 | solc (compilador Solidity) | última disponível |
 
