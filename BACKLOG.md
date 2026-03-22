@@ -33,6 +33,11 @@ _Nenhuma tarefa em andamento._
 | US-008 | Alumni atualiza dados do perfil off-chain | 🟢 | `backlog` | M |
 | US-009 | Administrador adiciona outro administrador | 🟢 | `backlog` | P |
 | US-010 | Alumni silencia um membro específico em um canal | 🟡 | `backlog` | M |
+| US-014 | Alumni denuncia uma mensagem aos administradores | 🟡 | `backlog` | M |
+| US-015 | Administrador visualiza e gerencia denúncias recebidas | 🟡 | `backlog` | M |
+| US-016 | Agente pessoal alerta alumni sobre conteúdo inadequado antes de enviar | 🟡 | `backlog` | G |
+| US-017 | coZap expõe MCP Server para integração com assistentes pessoais de IA | 🟡 | `backlog` | G |
+| US-018 | Alumni reencaminha mensagem preservando cadeia de proveniência | 🟢 | `backlog` | M |
 | US-011 | Alumni visualiza mensagens de membros silenciados via toggle | 🟢 | `backlog` | P |
 | US-012 | Agente avalia aderência de mensagens ao tópico do canal | 🟡 | `backlog` | G |
 | US-013 | Alumni configura threshold de relevância e filtra mensagens pelo score do agente | 🟡 | `backlog` | M |
@@ -152,6 +157,94 @@ _Nenhuma tarefa em andamento._
 
 ---
 
+## Detalhamento de US-014
+
+**Como** alumni,
+**quero** denunciar uma mensagem aos administradores,
+**para que** condutas inadequadas ou ilegais sejam apuradas.
+
+**Regras:**
+- Denúncia é anônima ou identificada — **o alumni escolhe** no momento do envio
+- Ao denunciar, o sistema captura: mensagem denunciada + cadeia completa de eventos Nostr (eventos pai via tags `e`) + comentário opcional do denunciante
+- A denúncia fica **arquivada permanentemente** — nunca deletada, mesmo que a mensagem seja removida do relay
+- Admins recebem notificação de nova denúncia
+- Escopo inicial: **somente admins**. Futuro: possibilidade de encaminhar a autoridades externas
+
+**Fora de escopo por ora:**
+- Integração com portais policiais ou autoridades externas
+- Feedback ao denunciante sobre o resultado da apuração
+
+---
+
+## Detalhamento de US-015
+
+**Como** administrador,
+**quero** visualizar e gerenciar as denúncias recebidas,
+**para que** eu possa apurar cada caso com contexto completo.
+
+**Regras:**
+- Painel lista denúncias por data, com status: `nova`, `em apuração`, `encerrada`
+- Cada denúncia exibe: mensagem denunciada, cadeia de proveniência, identidade do denunciante (se não anônimo) e comentário
+- Admin pode atualizar status e adicionar nota interna
+- Denúncias nunca são deletadas
+
+**Depende de:** US-014
+
+---
+
+## Detalhamento de US-016
+
+**Como** alumni,
+**quero** que meu assistente pessoal de IA me alerte antes de enviar uma mensagem possivelmente inadequada,
+**para que** eu possa revisar o conteúdo antes de publicá-lo.
+
+**Regras:**
+- O alerta é **não bloqueante** — o alumni pode ignorar e enviar mesmo assim
+- A avaliação ocorre **no cliente**, antes de assinar e publicar o evento Nostr
+- O agente usa o contexto do canal (nome, descrição, regras) fornecido pelo MCP Server (US-017)
+- Cada alumni configura seu próprio provider de IA — a plataforma não impõe nenhum
+- Se nenhum agente estiver configurado, a feature simplesmente não aparece
+
+**Depende de:** US-017
+
+---
+
+## Detalhamento de US-017
+
+**Como** plataforma coZap,
+**quero** expor um MCP Server com ferramentas e contexto da comunidade,
+**para que** assistentes pessoais de IA dos alumni possam usá-lo para avaliações contextualizadas.
+
+**Ferramentas expostas pelo MCP:**
+- `get_channel_context(channelId)` — retorna nome, descrição e regras do canal
+- `get_community_rules()` — retorna as diretrizes gerais da comunidade Alumni Poli
+- `get_recent_messages(channelId, limit)` — retorna mensagens recentes para contextualizar o tom
+
+**Regras:**
+- MCP Server é autenticado — só alumni verificados (com SBT) podem conectar
+- O alumni configura a URL do MCP Server no seu assistente (Claude Desktop, Cursor, etc.)
+- O provider de IA é escolha do alumni — a plataforma é agnóstica
+
+**Fora de escopo por ora:**
+- Ferramentas de escrita/envio de mensagem via MCP (somente leitura de contexto)
+- MCP para admin (gerenciar denúncias via assistente)
+
+---
+
+## Detalhamento de US-018
+
+**Como** alumni,
+**quero** reencaminhar uma mensagem de um canal para outros membros,
+**para que** conteúdo relevante circule na comunidade com rastreabilidade de origem.
+
+**Regras:**
+- Implementação via **NIP-18** (Nostr repost) — o evento de repost referencia o evento original via tag `e`
+- A cadeia é preservada: repost → mensagem repostada → mensagens pai (se for uma resposta)
+- Ao denunciar um repost (US-014), a cadeia completa — incluindo a mensagem original — é capturada
+- O contexto original fica acessível para admins na investigação, evitando perda de sentido por repasse fora de contexto
+
+---
+
 ## Notas de iteração
 
 - **2026-03-17**: Backlog reordenado para refletir fluxo real de uso. Adicionada
@@ -177,3 +270,6 @@ _Nenhuma tarefa em andamento._
 - **2026-03-22**: US-010 a US-013 adicionadas — duas iniciativas independentes:
   silêncio de membros por canal (local, US-010/011) e agente de relevância com
   threshold configurável (centralizado, US-012/013). Provider de IA a definir.
+- **2026-03-22**: US-014 a US-018 adicionadas — sistema de denúncias (US-014/015),
+  agente pessoal de alerta via MCP (US-016/017) e reencaminhamento com cadeia de
+  proveniência (US-018).
