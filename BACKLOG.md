@@ -32,6 +32,10 @@ _Nenhuma tarefa em andamento._
 | US-007 | Alumni visualiza perfil próprio com formações | 🟡 | `backlog` | M |
 | US-008 | Alumni atualiza dados do perfil off-chain | 🟢 | `backlog` | M |
 | US-009 | Administrador adiciona outro administrador | 🟢 | `backlog` | P |
+| US-010 | Alumni silencia um membro específico em um canal | 🟡 | `backlog` | M |
+| US-011 | Alumni visualiza mensagens de membros silenciados via toggle | 🟢 | `backlog` | P |
+| US-012 | Agente avalia aderência de mensagens ao tópico do canal | 🟡 | `backlog` | G |
+| US-013 | Alumni configura threshold de relevância e filtra mensagens pelo score do agente | 🟡 | `backlog` | M |
 
 ---
 
@@ -85,6 +89,69 @@ _Nenhuma tarefa em andamento._
 
 ---
 
+## Detalhamento de US-010
+
+**Como** alumni,
+**quero** silenciar um membro específico em um canal,
+**para que** suas mensagens não apareçam no meu feed daquele canal.
+
+**Regras:**
+- Silêncio é **local** (armazenado no dispositivo, não sincronizado via relay)
+- Silêncio é **por canal** (silenciar em um canal não afeta outros)
+- Mensagens de membros silenciados são filtradas no cliente antes da renderização
+- O membro silenciado não é notificado
+
+**Fora de escopo por ora:**
+- Sincronização entre dispositivos (NIP-51)
+- Visualização de mensagens silenciadas (US-011)
+
+---
+
+## Detalhamento de US-011
+
+**Como** alumni,
+**quero** poder ver as mensagens de membros que silenciei via toggle "Mostrar silenciados",
+**para que** eu possa consultar o histórico quando quiser.
+
+**Depende de:** US-010
+
+---
+
+## Detalhamento de US-012
+
+**Como** plataforma coZap,
+**quero** que um agente de IA avalie a aderência de cada mensagem ao tópico do canal,
+**para que** os membros possam filtrar conteúdo fora do escopo esperado.
+
+**Regras:**
+- Avaliação é **centralizada** (serviço do coZap, não por membro)
+- Score de aderência com **gradação** (ex: 0.0 a 1.0)
+- O agente recebe: conteúdo da mensagem + descrição do canal
+- Score é publicado como metadata da mensagem (evento Nostr kind 1078 ou tag customizada)
+- Provider de IA a definir — priorizar menor custo (candidatos: Claude Haiku, Gemini Flash, Groq)
+
+**Fora de escopo por ora:**
+- Feedback dos membros para melhorar o modelo
+- Moderação automática baseada no score
+
+---
+
+## Detalhamento de US-013
+
+**Como** alumni,
+**quero** configurar um threshold de relevância e filtrar mensagens pelo score do agente,
+**para que** eu veja apenas mensagens com aderência acima do meu limite de tolerância.
+
+**Regras:**
+- Threshold configurável por canal (ex: slider 0–100%)
+- Mensagens abaixo do threshold são ocultadas (mesmo comportamento da US-010)
+- Configuração armazenada localmente
+- Depende do score gerado pela US-012 estar disponível na mensagem
+
+**Depende de:** US-012
+
+---
+
 ## Notas de iteração
 
 - **2026-03-17**: Backlog reordenado para refletir fluxo real de uso. Adicionada
@@ -107,3 +174,6 @@ _Nenhuma tarefa em andamento._
 - **2026-03-17**: US-005 concluída — `useSendMessage` assina evento kind 42 com
   `finalizeEvent` e publica via `SimplePool.publish`. Formulário de envio na página
   `/comunidade` com limpeza automática e exibição de erro. 65 testes web.
+- **2026-03-22**: US-010 a US-013 adicionadas — duas iniciativas independentes:
+  silêncio de membros por canal (local, US-010/011) e agente de relevância com
+  threshold configurável (centralizado, US-012/013). Provider de IA a definir.
