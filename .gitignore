@@ -39,3 +39,6 @@ Thumbs.db
 
 # Turbo
 .turbo/
+
+# Claude Code (local)
+.claude/
