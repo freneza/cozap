@@ -59,6 +59,20 @@ Interface web construída com Next.js.
 
 ---
 
+## Documentação
+
+| Documento | Descrição |
+|---|---|
+| [docs/dev/DEV.md](docs/dev/DEV.md) | Guia do devcontainer |
+| [docs/dev/c4-context.md](docs/dev/c4-context.md) | C4 Nível 1 — Contexto do sistema |
+| [docs/dev/c4-container.md](docs/dev/c4-container.md) | C4 Nível 2 — Containers e comunicação |
+| [docs/dev/class-diagram.md](docs/dev/class-diagram.md) | Diagrama de classes |
+| [docs/dev/component-diagram.md](docs/dev/component-diagram.md) | Diagrama de componentes |
+| [docs/dev/login-flow.md](docs/dev/login-flow.md) | Fluxo de login (Web3Auth + SBT) |
+| [docs/adr/](docs/adr/) | Architecture Decision Records |
+
+---
+
 ## Ambiente de desenvolvimento
 
 O projeto inclui um **devcontainer** com Node.js 22, pnpm 9.15.4, Claude Code CLI e todas as extensões do VS Code pré-configuradas. Basta abrir a pasta no VS Code e clicar em _Reopen in Container_.

@@ -41,6 +41,17 @@ coZap/
     └── dev/              # Guias de desenvolvimento
 ```
 
+## Documentação de arquitetura
+
+| Documento | Descrição |
+|---|---|
+| [docs/dev/c4-context.md](docs/dev/c4-context.md) | C4 Nível 1 — atores e sistemas externos |
+| [docs/dev/c4-container.md](docs/dev/c4-container.md) | C4 Nível 2 — containers e protocolos |
+| [docs/dev/class-diagram.md](docs/dev/class-diagram.md) | Classes, interfaces, hooks e contrato |
+| [docs/dev/component-diagram.md](docs/dev/component-diagram.md) | Dependências entre componentes |
+| [docs/dev/login-flow.md](docs/dev/login-flow.md) | Fluxo de autenticação (Web3Auth + SBT) |
+| [docs/adr/](docs/adr/) | Architecture Decision Records |
+
 ## Convenções de código
 
 - **TypeScript**: ESM (`"type": "module"`), strict mode, sem `any` explícito.
