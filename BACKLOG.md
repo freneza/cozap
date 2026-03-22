@@ -33,6 +33,10 @@ _Nenhuma tarefa em andamento._
 | US-008 | Alumni atualiza dados do perfil off-chain | 🟢 | `backlog` | M |
 | US-009 | Administrador adiciona outro administrador | 🟢 | `backlog` | P |
 | US-010 | Alumni silencia um membro específico em um canal | 🟡 | `backlog` | M |
+| US-019 | Administrador revoga SBT de membro em caso de fraude ou conduta grave | 🔴 | `backlog` | M |
+| US-020 | Alumni inclui evidência de formação (Lattes ou LinkedIn) na solicitação de credencial | 🟡 | `backlog` | P |
+| US-021 | Sistema detecta solicitações com dados de formação duplicados | 🟡 | `backlog` | P |
+| US-022 | Alumni verificado indica outro alumni como referência na solicitação | 🟢 | `backlog` | M |
 | US-014 | Alumni denuncia uma mensagem aos administradores | 🟡 | `backlog` | M |
 | US-015 | Administrador visualiza e gerencia denúncias recebidas | 🟡 | `backlog` | M |
 | US-016 | Agente pessoal alerta alumni sobre conteúdo inadequado antes de enviar | 🟡 | `backlog` | G |
@@ -157,6 +161,64 @@ _Nenhuma tarefa em andamento._
 
 ---
 
+## Detalhamento de US-019
+
+**Como** administrador,
+**quero** revogar o SBT de um membro,
+**para que** credenciais emitidas por erro ou fraude possam ser canceladas.
+
+**Regras:**
+- Nova função `revokeCredential(address)` no contrato `AlumniSBT.sol`, restrita a `onlyAdmin`
+- Revogação emite evento `CredentialRevoked(address indexed member, address indexed revokedBy)`
+- Após revogação: `hasCredential(address)` retorna `false`, token é deletado dos mappings
+- Membro perde acesso à plataforma imediatamente (hook `useHasCredential` detecta na próxima verificação)
+- Revogação é **irreversível** — para reintegrar, o membro precisa solicitar nova credencial
+- Registro on-chain garante rastreabilidade de quem revogou e quando
+
+**Impacto em outros contratos:** nenhum — token é soulbound e não há mercado secundário.
+
+---
+
+## Detalhamento de US-020
+
+**Como** alumni,
+**quero** incluir uma URL do Lattes ou LinkedIn na minha solicitação de credencial,
+**para que** o administrador tenha uma evidência adicional para verificar minha formação.
+
+**Regras:**
+- Campo opcional no formulário de solicitação (US-001)
+- Admin visualiza a URL no painel de revisão (US-002)
+- Sem validação automática — verificação continua manual
+
+---
+
+## Detalhamento de US-021
+
+**Como** sistema,
+**quero** detectar solicitações com dados de formação idênticos a uma credencial já aprovada,
+**para que** o admin seja alertado sobre possível duplicata antes de aprovar.
+
+**Regras:**
+- Ao criar solicitação, verifica se existe `CredentialRequest` aprovado com mesmo `course` + `graduationYear` + `degreeType`
+- Se duplicata encontrada: solicitação é criada normalmente, mas admin vê alerta visual no painel
+- Não bloqueia o fluxo — admin decide se é duplicata legítima (ex: dois alumni do mesmo curso e ano) ou fraude
+
+---
+
+## Detalhamento de US-022
+
+**Como** alumni verificado,
+**quero** indicar outro alumni como referência em uma solicitação de credencial,
+**para que** o admin tenha um sinal adicional de confiança na aprovação.
+
+**Regras:**
+- Campo opcional na solicitação: endereço ou nome de um alumni verificado que conhece o solicitante
+- Sistema valida que o alumni indicado possui SBT ativo (`hasCredential = true`)
+- Admin vê a indicação no painel de revisão — não substitui a verificação manual
+- O alumni indicado **não é notificado** nesta versão (fora de escopo por ora)
+
+---
+
 ## Detalhamento de US-014
 
 **Como** alumni,
@@ -273,3 +335,5 @@ _Nenhuma tarefa em andamento._
 - **2026-03-22**: US-014 a US-018 adicionadas — sistema de denúncias (US-014/015),
   agente pessoal de alerta via MCP (US-016/017) e reencaminhamento com cadeia de
   proveniência (US-018).
+- **2026-03-22**: US-019 a US-022 adicionadas — mecanismos anti-perfil-falso: revogação
+  de SBT (🔴 alta prioridade), evidência de formação, detecção de duplicatas e vouching.
