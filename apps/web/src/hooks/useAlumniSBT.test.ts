@@ -113,4 +113,65 @@ describe('useAlumniSBT', () => {
 
     expect(result.current.error).toBe('Sem saldo para gas')
   })
+
+  it('lança erro se provider for null', async () => {
+    vi.mocked(useWeb3Auth).mockReturnValue({
+      provider: null,
+    } as unknown as ReturnType<typeof useWeb3Auth>)
+
+    const { result } = renderHook(() => useAlumniSBT())
+
+    await act(async () => {
+      await expect(
+        result.current.issueCredential('0xAlumni1234' as `0x${string}`, '0xHash1234' as `0x${string}`),
+      ).rejects.toThrow('Carteira não conectada')
+    })
+  })
+
+  it('lança erro se NEXT_PUBLIC_ALUMNI_SBT_ADDRESS não estiver configurado', async () => {
+    delete process.env.NEXT_PUBLIC_ALUMNI_SBT_ADDRESS
+
+    const { result } = renderHook(() => useAlumniSBT())
+
+    await act(async () => {
+      await expect(
+        result.current.issueCredential('0xAlumni1234' as `0x${string}`, '0xHash1234' as `0x${string}`),
+      ).rejects.toThrow('NEXT_PUBLIC_ALUMNI_SBT_ADDRESS não configurado')
+    })
+  })
+
+  it('lança erro se nenhuma conta estiver disponível', async () => {
+    vi.mocked(createWalletClient).mockReturnValue({
+      getAddresses: vi.fn().mockResolvedValue([]),
+      writeContract: vi.fn(),
+    } as unknown as ReturnType<typeof createWalletClient>)
+
+    const { result } = renderHook(() => useAlumniSBT())
+
+    await act(async () => {
+      try {
+        await result.current.issueCredential('0xAlumni1234' as `0x${string}`, '0xHash1234' as `0x${string}`)
+      } catch {
+        // esperado
+      }
+    })
+
+    expect(result.current.error).toBe('Nenhuma conta disponível')
+  })
+
+  it('error usa mensagem genérica quando erro não é instância de Error', async () => {
+    mockWalletClient(vi.fn().mockRejectedValue('falha desconhecida'))
+
+    const { result } = renderHook(() => useAlumniSBT())
+
+    await act(async () => {
+      try {
+        await result.current.issueCredential('0xAlumni1234' as `0x${string}`, '0xHash1234' as `0x${string}`)
+      } catch {
+        // esperado
+      }
+    })
+
+    expect(result.current.error).toBe('Erro ao emitir credencial')
+  })
 })

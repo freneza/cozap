@@ -89,6 +89,65 @@ describe('useSendMessage', () => {
     expect(result.current.error).toBe('Relay recusou')
   })
 
+  it('error usa mensagem de Error lançado por finalizeEvent', async () => {
+    vi.mocked(finalizeEvent).mockImplementationOnce(() => {
+      throw new Error('chave inválida')
+    })
+
+    const { result } = renderHook(() =>
+      useSendMessage(CHANNEL_ID, RELAY_URLS, PRIVKEY),
+    )
+
+    await act(async () => {
+      try {
+        await result.current.sendMessage('Teste')
+      } catch {
+        // esperado
+      }
+    })
+
+    expect(result.current.error).toBe('chave inválida')
+  })
+
+  it('error usa mensagem genérica quando erro não é instância de Error', async () => {
+    vi.mocked(finalizeEvent).mockImplementationOnce(() => {
+      // eslint-disable-next-line @typescript-eslint/no-throw-literal
+      throw 'falha desconhecida'
+    })
+
+    const { result } = renderHook(() =>
+      useSendMessage(CHANNEL_ID, RELAY_URLS, PRIVKEY),
+    )
+
+    await act(async () => {
+      try {
+        await result.current.sendMessage('Teste')
+      } catch {
+        // esperado
+      }
+    })
+
+    expect(result.current.error).toBe('Erro ao enviar mensagem')
+  })
+
+  it('error usa mensagem do primeiro erro de AggregateError quando não é Error', async () => {
+    makePool(Promise.reject('falha como string'))
+
+    const { result } = renderHook(() =>
+      useSendMessage(CHANNEL_ID, RELAY_URLS, PRIVKEY),
+    )
+
+    await act(async () => {
+      try {
+        await result.current.sendMessage('Teste')
+      } catch {
+        // esperado
+      }
+    })
+
+    expect(result.current.error).toBe('Erro ao enviar mensagem')
+  })
+
   it('isSending é true durante o publish', async () => {
     let resolve!: () => void
     const pending = new Promise<string>((res) => {

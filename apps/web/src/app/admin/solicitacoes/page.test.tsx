@@ -115,6 +115,42 @@ describe('SolicitacoesPage', () => {
     })
   })
 
+  it('exibe erro se rejeição falhar', async () => {
+    const pending = makePending('1')
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => [pending] })
+      .mockRejectedValueOnce(new Error('Falha no servidor'))
+
+    const user = userEvent.setup()
+    render(<SolicitacoesPage />)
+
+    await waitFor(() => expect(screen.getByText('Alumni 1')).toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: /rejeitar/i }))
+    await user.click(screen.getByRole('button', { name: /confirmar rejeição/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Falha no servidor')
+    })
+  })
+
+  it('botão cancelar fecha o modo de rejeição', async () => {
+    const pending = makePending('1')
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => [pending] })
+
+    const user = userEvent.setup()
+    render(<SolicitacoesPage />)
+
+    await waitFor(() => expect(screen.getByText('Alumni 1')).toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: /rejeitar/i }))
+
+    expect(screen.getByPlaceholderText(/motivo/i)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /cancelar/i }))
+
+    expect(screen.queryByPlaceholderText(/motivo/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /rejeitar/i })).toBeInTheDocument()
+  })
+
   it('exibe erro se issueCredential falhar', async () => {
     const pending = makePending('1')
     global.fetch = vi.fn().mockResolvedValueOnce({ ok: true, json: async () => [pending] })
@@ -134,6 +170,60 @@ describe('SolicitacoesPage', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Sem gas')
+    })
+  })
+
+  it('exibe mensagem genérica se issueCredential lançar não-Error', async () => {
+    const pending = makePending('1')
+    global.fetch = vi.fn().mockResolvedValueOnce({ ok: true, json: async () => [pending] })
+
+    const { useAlumniSBT } = await import('../../../hooks/useAlumniSBT.js')
+    vi.mocked(useAlumniSBT).mockReturnValue({
+      issueCredential: vi.fn().mockRejectedValue('falha estranha'),
+      isLoading: false,
+      error: null,
+    })
+
+    const user = userEvent.setup()
+    render(<SolicitacoesPage />)
+
+    await waitFor(() => expect(screen.getByText('Alumni 1')).toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: /aprovar/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Erro ao aprovar')
+    })
+  })
+
+  it('exibe mensagem genérica se rejeição lançar não-Error', async () => {
+    const pending = makePending('1')
+    global.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => [pending] })
+      .mockRejectedValueOnce('erro não-Error')
+
+    const user = userEvent.setup()
+    render(<SolicitacoesPage />)
+
+    await waitFor(() => expect(screen.getByText('Alumni 1')).toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: /rejeitar/i }))
+    await user.click(screen.getByRole('button', { name: /confirmar rejeição/i }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Erro ao rejeitar')
+    })
+  })
+
+  it('exibe degreeType desconhecido sem tradução', async () => {
+    const pending = {
+      ...makePending('1'),
+      data: { ...makePending('1').data, degreeType: 'postdoc' as 'graduation' },
+    }
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => [pending] })
+
+    render(<SolicitacoesPage />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/postdoc/)).toBeInTheDocument()
     })
   })
 })

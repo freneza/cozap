@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { InMemoryCredentialRequestRepository } from './repository'
+import { InMemoryCredentialRequestRepository, getRepository } from './repository'
 import { CredentialRequest } from '@cozap/core'
 
 const makeRequest = (overrides?: Partial<CredentialRequest>): CredentialRequest => ({
@@ -80,5 +80,18 @@ describe('InMemoryCredentialRequestRepository', () => {
   it('updateStatus retorna null para id inexistente', async () => {
     const result = await repo.updateStatus('inexistente', 'approved')
     expect(result).toBeNull()
+  })
+})
+
+describe('getRepository', () => {
+  it('retorna uma instância do repositório', () => {
+    const instance = getRepository()
+    expect(instance).toBeInstanceOf(InMemoryCredentialRequestRepository)
+  })
+
+  it('retorna a mesma instância em chamadas subsequentes (singleton)', () => {
+    const a = getRepository()
+    const b = getRepository()
+    expect(a).toBe(b)
   })
 })

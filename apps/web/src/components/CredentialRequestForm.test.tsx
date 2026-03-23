@@ -2,7 +2,12 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CredentialRequestForm } from './CredentialRequestForm'
-import { CredentialRequest } from '@cozap/core'
+import { CredentialRequest, buildCredentialRequest } from '@cozap/core'
+
+vi.mock('@cozap/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cozap/core')>()
+  return { ...actual, buildCredentialRequest: vi.fn(actual.buildCredentialRequest) }
+})
 
 const address = '0xAbCd1234AbCd1234AbCd1234AbCd1234AbCd1234' as `0x${string}`
 
@@ -72,5 +77,40 @@ describe('CredentialRequestForm', () => {
     await user.click(screen.getByRole('button', { name: 'Enviar solicitação' }))
 
     expect(screen.getByRole('button', { name: 'Enviando…' })).toBeDisabled()
+  })
+
+  it('exibe erro genérico quando buildCredentialRequest lança erro inesperado', async () => {
+    vi.mocked(buildCredentialRequest).mockImplementationOnce(() => {
+      throw new Error('Erro interno inesperado')
+    })
+
+    const user = userEvent.setup()
+    render(<CredentialRequestForm address={address} onSubmit={vi.fn()} />)
+
+    await user.type(screen.getByLabelText('Nome completo'), 'João Silva')
+    await user.type(screen.getByLabelText('Curso de formação'), 'Engenharia Elétrica')
+    await user.type(screen.getByLabelText('Ano de entrada'), '2015')
+    await user.type(screen.getByLabelText('Ano de conclusão'), '2020')
+    await user.click(screen.getByRole('button', { name: 'Enviar solicitação' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Erro inesperado. Tente novamente.')
+  })
+
+  it('permite selecionar tipo de diploma mestrado', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+    render(<CredentialRequestForm address={address} onSubmit={onSubmit} />)
+
+    await user.selectOptions(screen.getByLabelText('Tipo de diploma'), 'masters')
+
+    await user.type(screen.getByLabelText('Nome completo'), 'João Silva')
+    await user.type(screen.getByLabelText('Curso de formação'), 'Engenharia Elétrica')
+    await user.type(screen.getByLabelText('Ano de entrada'), '2015')
+    await user.type(screen.getByLabelText('Ano de conclusão'), '2020')
+    await user.click(screen.getByRole('button', { name: 'Enviar solicitação' }))
+
+    expect(onSubmit).toHaveBeenCalledOnce()
+    const request: CredentialRequest = onSubmit.mock.calls[0]![0]
+    expect(request.data.degreeType).toBe('masters')
   })
 })
