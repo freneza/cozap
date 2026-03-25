@@ -32,7 +32,7 @@ _Nenhuma tarefa em andamento._
 | US-007 | Alumni visualiza perfil próprio com formações | 🟡 | `backlog` | M |
 | US-008 | Alumni atualiza dados do perfil off-chain | 🟢 | `backlog` | M |
 | US-009 | Administrador adiciona outro administrador | 🟢 | `backlog` | P |
-| US-010 | Alumni silencia um membro específico em um canal | 🟡 | `backlog` | M |
+| US-010 | Alumni silencia um membro específico em um canal | 🔴 | `backlog` | M |
 | US-019 | Administrador revoga SBT de membro em caso de fraude ou conduta grave | 🔴 | `backlog` | M |
 | US-020 | Alumni inclui evidência de formação (Lattes ou LinkedIn) na solicitação de credencial | 🟡 | `backlog` | P |
 | US-021 | Sistema detecta solicitações com dados de formação duplicados | 🟡 | `backlog` | P |
@@ -45,6 +45,16 @@ _Nenhuma tarefa em andamento._
 | US-011 | Alumni visualiza mensagens de membros silenciados via toggle | 🟢 | `backlog` | P |
 | US-012 | Agente avalia aderência de mensagens ao tópico do canal | 🟡 | `backlog` | G |
 | US-013 | Alumni configura threshold de relevância e filtra mensagens pelo score do agente | 🟡 | `backlog` | M |
+| US-023 | Alumni reage a uma mensagem com emoji | 🔴 | `backlog` | P |
+| US-024 | Alumni busca mensagens em um canal | 🔴 | `backlog` | M |
+| US-025 | Alumni ou admin fixa uma mensagem em um canal | 🔴 | `backlog` | P |
+| US-026 | Alumni silencia notificações de um canal ou grupo | 🔴 | `backlog` | P |
+| US-027 | Alumni bloqueia um membro da plataforma | 🔴 | `backlog` | M |
+| US-028 | Alumni configura foto e bio no perfil | 🟡 | `backlog` | M |
+| US-029 | Tag de membro no grupo exibe curso e período de formação | 🟡 | `backlog` | P |
+| US-032 | Grupos suportam até 10.000 membros com lista criptografada e controles de admin | 🟡 | `backlog` | G |
+| US-030 | Plataforma previne capturas de tela (screen security) | 🟢 | `backlog` | M |
+| US-031 | Alumni configura tempo de expiração de mensagens em um canal | 🟢 | `backlog` | M |
 
 ---
 
@@ -307,6 +317,173 @@ _Nenhuma tarefa em andamento._
 
 ---
 
+---
+
+## Detalhamento de US-023
+
+**Como** alumni,
+**quero** reagir a uma mensagem com um emoji,
+**para que** eu possa expressar sentimentos de forma rápida sem precisar enviar uma mensagem.
+
+**Regras:**
+- Qualquer emoji pode ser usado como reação
+- Uma mensagem pode ter múltiplas reações de membros diferentes
+- O mesmo alumni pode reagir com emojis diferentes à mesma mensagem
+- Reações são exibidas agrupadas por emoji com contagem
+- Implementação via evento Nostr kind 7 (NIP-25 — Reactions)
+- Reação negativa (`-`) remove a reação anterior do mesmo alumni
+
+---
+
+## Detalhamento de US-024
+
+**Como** alumni,
+**quero** buscar mensagens em um canal por palavra-chave,
+**para que** eu possa encontrar conteúdo relevante sem rolar o histórico inteiro.
+
+**Regras:**
+- Busca local no histórico de mensagens já carregadas pelo cliente (sem consulta ao relay)
+- Busca por substring no conteúdo da mensagem (case-insensitive)
+- Resultados exibidos com contexto (canal, data, autor)
+- Escopo inicial: canal em que o alumni está — busca global entre canais é fora de escopo por ora
+- Não é necessário armazenar índice no servidor — privacidade preservada
+
+---
+
+## Detalhamento de US-025
+
+**Como** alumni ou admin,
+**quero** fixar uma mensagem em um canal,
+**para que** informações importantes fiquem visíveis para todos os membros.
+
+**Regras:**
+- Até 3 mensagens podem estar fixadas simultaneamente por canal
+- Apenas admins podem fixar mensagens (permissão padrão — pode ser alterada por admin)
+- Mensagem fixada aparece em destaque no topo do canal
+- Fixar/desafixar é registrado como evento Nostr (kind 9041 ou tag customizada)
+- Duração: permanente até ser desafixada (sem expiração automática nesta versão)
+
+---
+
+## Detalhamento de US-026
+
+**Como** alumni,
+**quero** silenciar as notificações de um canal ou grupo,
+**para que** eu não seja interrompido por mensagens de canais de baixa prioridade.
+
+**Regras:**
+- Silêncio é **local** (armazenado no dispositivo)
+- Canal silenciado ainda pode ser acessado — apenas não gera notificação push
+- Alumni pode configurar duração: 8h, 24h, 1 semana, ou permanente
+- Interface: ícone de sino no canal indica se está silenciado
+- Independente do silêncio de membros (US-010) — são controles distintos
+
+---
+
+## Detalhamento de US-027
+
+**Como** alumni,
+**quero** bloquear um membro da plataforma,
+**para que** eu não receba mensagens dele em nenhum canal.
+
+**Regras:**
+- Bloqueio é **global** (afeta todos os canais, diferente do silêncio por canal da US-010)
+- Membro bloqueado não sabe que foi bloqueado
+- Mensagens do membro bloqueado não aparecem para o alumni em nenhum canal
+- Lista de bloqueados armazenada localmente
+- Alumni pode desbloquear a qualquer momento
+- Bloqueio persiste mesmo que o membro troque de chave Nostr (identificado por npub)
+
+**Diferença em relação a US-010:** US-010 silencia um membro em um canal específico; US-027 bloqueia globalmente.
+
+---
+
+## Detalhamento de US-028
+
+**Como** alumni,
+**quero** adicionar foto e bio ao meu perfil,
+**para que** outros membros da comunidade possam me identificar e conhecer meu contexto.
+
+**Regras:**
+- Campos adicionais ao perfil: foto (URL ou upload), bio (texto livre, limite de 200 caracteres)
+- Dados armazenados off-chain (banco de dados da aplicação) — não na blockchain
+- Foto e bio são visíveis para todos os membros verificados da plataforma
+- Expande US-007 (visualização) e US-008 (atualização de dados do perfil)
+- Nome exibível já existe como campo — esta US adiciona foto e bio
+
+---
+
+## Detalhamento de US-029
+
+**Como** membro de um canal,
+**quero** ver a tag de outro membro exibindo seu curso e período de formação,
+**para que** eu possa identificar rapidamente o contexto acadêmico de quem está participando.
+
+**Regras:**
+- Tag exibida ao lado do nome do membro nas mensagens do canal
+- Formato sugerido: `Eng. Civil '12` (curso abreviado + ano de conclusão)
+- Conteúdo da tag derivado dos dados de credencial aprovada (US-001/002) — sem input manual
+- Alumni pode optar por ocultar sua tag (privacidade)
+- Admins podem permitir que membros customizem rótulos adicionais (papel no grupo, ex: "Moderador", "Alumni Destaque")
+
+---
+
+## Detalhamento de US-032
+
+**Como** plataforma coZap,
+**quero** que grupos suportem até 10.000 membros com lista de membros criptografada e controles de admin granulares,
+**para que** a comunidade Alumni Poli possa crescer sem limitações técnicas e com privacidade dos participantes.
+
+**Requisitos de escala:**
+- Capacidade de até 10.000 membros por grupo/canal
+- Arquitetura de relay Nostr deve ser validada para este volume (NIP-29 para grupos gerenciados)
+
+**Criptografia de membros:**
+- Lista de membros do grupo armazenada de forma criptografada no relay
+- Apenas membros com a chave do grupo podem descriptografar a lista
+- Zero-knowledge proofs para autenticação de membros sem revelar identidade ao relay
+- Referência de implementação: Signal Private Group System
+
+**Controles de admin:**
+- Configurar quem pode postar (todos os membros / somente admins)
+- Adicionar e remover membros
+- Definir rótulos de papel por membro (ex: "Moderador", "Fundador")
+- Fixar mensagens (permissão delegável aos membros)
+- Transferir permissão de admin para outro membro
+
+**Fora de escopo por ora:**
+- Subgrupos ou canais aninhados
+- Sincronização de configurações entre dispositivos do mesmo admin
+
+---
+
+## Detalhamento de US-030
+
+**Como** alumni,
+**quero** que a plataforma previna capturas de tela de conversas,
+**para que** o conteúdo privado da comunidade não seja facilmente vazado.
+
+**Regras:**
+- Em mobile (iOS/Android): usar flags nativas da plataforma para bloquear screenshot (FLAG_SECURE no Android, API de proteção de conteúdo no iOS)
+- Em desktop (web): overlay ou aviso ao detectar tentativa de screenshot (limitação técnica — não é 100% eficaz no browser)
+- Aplicado em todas as telas com mensagens
+- Configurável pelo admin do canal (on/off por canal)
+
+---
+
+## Detalhamento de US-031
+
+**Como** alumni,
+**quero** configurar um tempo de expiração para mensagens em um canal,
+**para que** o histórico não se acumule indefinidamente e conversas sensíveis não fiquem permanentes.
+
+**Regras:**
+- Opções de expiração: 24h, 7 dias, 30 dias, ou sem expiração
+- Configuração por canal, definida pelo admin
+- Mensagens expiradas são removidas localmente do cliente (não do relay, salvo se o relay suportar deleção via NIP-09)
+- Evento de deleção (NIP-09) é publicado no relay ao expirar, sinalizando que os demais clientes devem remover
+- Alumni vê indicador visual de que o canal tem expiração configurada
+
 ## Notas de iteração
 
 - **2026-03-17**: Backlog reordenado para refletir fluxo real de uso. Adicionada
@@ -337,3 +514,9 @@ _Nenhuma tarefa em andamento._
   proveniência (US-018).
 - **2026-03-22**: US-019 a US-022 adicionadas — mecanismos anti-perfil-falso: revogação
   de SBT (🔴 alta prioridade), evidência de formação, detecção de duplicatas e vouching.
+- **2026-03-25**: US-023 a US-032 adicionadas — funcionalidades de mensageria básica
+  inspiradas no Signal como referência de app de mensagens: reações, busca, mensagens
+  fixadas, silêncio de canal, bloqueio de membro, perfil social, tag de membro no grupo,
+  grupos de até 10.000 membros com controles de admin e criptografia de lista de membros.
+  US-010 elevada para 🔴 Alta. Mensagens que desaparecem e screen security adicionadas
+  com 🟢 Baixa prioridade.
