@@ -55,6 +55,7 @@ _Nenhuma tarefa em andamento._
 | US-032 | Grupos suportam até 10.000 membros com lista criptografada e controles de admin | 🟡 | `backlog` | G |
 | US-030 | Plataforma previne capturas de tela (screen security) | 🟢 | `backlog` | M |
 | US-031 | Alumni configura tempo de expiração de mensagens em um canal | 🟢 | `backlog` | M |
+| US-033 | 🥚 Easter egg: notificação especial para membros computação2002 | 🟢 | `backlog` | P |
 
 ---
 
@@ -483,6 +484,22 @@ _Nenhuma tarefa em andamento._
 - Mensagens expiradas são removidas localmente do cliente (não do relay, salvo se o relay suportar deleção via NIP-09)
 - Evento de deleção (NIP-09) é publicado no relay ao expirar, sinalizando que os demais clientes devem remover
 - Alumni vê indicador visual de que o canal tem expiração configurada
+
+## Detalhamento de US-033
+
+**Como** membro com tag `computação2002`,
+**quero** ouvir um som especial ao receber mensagem de outro membro com a mesma tag,
+**para que** a turma de Computação 2002 tenha um sinal de reconhecimento secreto na plataforma.
+
+**Regras:**
+- Condição: remetente **e** destinatário possuem tag derivada de `computação2002` (curso Computação + ano de entrada 2002 ou conclusão 2002 — a definir na implementação)
+- Ao disparar a notificação, o som padrão é substituído por um áudio com a voz falando **"Eeeelaiá"**
+- Comportamento silencioso: nenhuma indicação visual diferente — apenas o som
+- Não documentado publicamente em nenhuma tela da plataforma
+- O arquivo de áudio é empacotado no bundle do cliente (sem dependência de CDN externo)
+- Se o canal estiver silenciado (US-026), o easter egg também é silenciado — respeita a preferência do usuário
+
+---
 
 ## Notas de iteração
 
