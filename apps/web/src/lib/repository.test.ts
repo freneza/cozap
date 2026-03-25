@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { InMemoryCredentialRequestRepository, getRepository } from './repository'
 import { CredentialRequest } from '@cozap/core'
 
@@ -84,7 +84,18 @@ describe('InMemoryCredentialRequestRepository', () => {
 })
 
 describe('getRepository', () => {
-  it('retorna uma instância do repositório', () => {
+  let originalDatabaseUrl: string | undefined
+
+  beforeEach(() => {
+    originalDatabaseUrl = process.env.DATABASE_URL
+    delete process.env.DATABASE_URL
+  })
+
+  afterEach(() => {
+    process.env.DATABASE_URL = originalDatabaseUrl
+  })
+
+  it('retorna InMemoryCredentialRequestRepository quando DATABASE_URL não está definida', () => {
     const instance = getRepository()
     expect(instance).toBeInstanceOf(InMemoryCredentialRequestRepository)
   })

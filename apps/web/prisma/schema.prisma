@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CredentialRequest {
+  id              String    @id
+  walletAddress   String
+  status          String    @default("pending")
+  requestedAt     DateTime
+  fullName        String
+  course          String
+  degreeType      String
+  entryYear       Int?
+  graduationYear  Int
+  dedupHash       String    // SHA-256(course||degreeType||graduationYear) — US-021
+  evidenceUrl     String?   // US-020
+  voucherAddress  String?   // US-022
+  rejectionReason String?
+  decidedAt       DateTime?
+  decidedBy       String?
+  createdAt       DateTime  @default(now())
+
+  @@map("credential_requests")
+}
