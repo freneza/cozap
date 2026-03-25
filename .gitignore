@@ -40,5 +40,8 @@ Thumbs.db
 # Turbo
 .turbo/
 
+# Testes
+coverage/
+
 # Claude Code (local)
 .claude/

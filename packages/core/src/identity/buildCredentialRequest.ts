@@ -1,4 +1,3 @@
-import { randomUUID } from 'node:crypto'
 import { CredentialRequest, CredentialRequestData } from './types.js'
 import { InvalidRequestData } from './errors.js'
 
@@ -15,7 +14,7 @@ export function buildCredentialRequest(
   }
 
   return {
-    id: randomUUID(),
+    id: globalThis.crypto.randomUUID(),
     walletAddress,
     status: 'pending',
     requestedAt: Date.now(),

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createPublicClient, http, parseAbi } from 'viem'
-import { polygon } from 'viem/chains'
+import { polygonAmoy } from 'viem/chains'
 
 const ABI = parseAbi(['function hasCredential(address account) view returns (bool)'])
 
@@ -24,7 +24,7 @@ export function useHasCredential(
     if (!contractAddress) return
 
     const client = createPublicClient({
-      chain: polygon,
+      chain: polygonAmoy,
       transport: http(
         process.env.NEXT_PUBLIC_AMOY_RPC_URL ?? 'https://rpc-amoy.polygon.technology',
       ),
@@ -41,6 +41,9 @@ export function useHasCredential(
       })
       .then((result) => {
         setHasCredential(result)
+      })
+      .catch(() => {
+        setHasCredential(false)
       })
       .finally(() => {
         setIsLoading(false)

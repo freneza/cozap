@@ -72,6 +72,20 @@ describe('useHasCredential', () => {
     })
   })
 
+  it('retorna hasCredential false quando a chamada RPC falha', async () => {
+    mockPublicClient(vi.fn().mockRejectedValue(new Error('network error')))
+
+    const { result } = renderHook(() =>
+      useHasCredential('0xAlumni1234' as `0x${string}`),
+    )
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    expect(result.current.hasCredential).toBe(false)
+  })
+
   it('chama readContract com functionName hasCredential e address correto', async () => {
     const readContract = vi.fn().mockResolvedValue(true)
     mockPublicClient(readContract)

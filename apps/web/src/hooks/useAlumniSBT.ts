@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { createWalletClient, custom, parseAbi } from 'viem'
-import { polygon } from 'viem/chains'
+import { createWalletClient, custom, parseAbi, parseGwei } from 'viem'
+import { polygonAmoy } from 'viem/chains'
 import { useWeb3Auth } from '@web3auth/modal-react-hooks'
 
 const ABI = parseAbi([
@@ -35,7 +35,7 @@ export function useAlumniSBT(): UseAlumniSBTResult {
 
     try {
       const walletClient = createWalletClient({
-        chain: polygon,
+        chain: polygonAmoy,
         transport: custom(provider),
       })
 
@@ -48,6 +48,9 @@ export function useAlumniSBT(): UseAlumniSBTResult {
         functionName: 'issueCredential',
         args: [to, hash],
         account,
+        gas: 300_000n,
+        maxFeePerGas: parseGwei('100'),
+        maxPriorityFeePerGas: parseGwei('30'),
       })
 
       return txHash
