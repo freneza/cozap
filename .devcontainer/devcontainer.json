@@ -1,9 +1,8 @@
 {
   "name": "coZap Dev",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "options": ["--network=host"]
-  },
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/coZap",
 
   // Monta o diretório .claude do host para preservar memória, histórico e
   // configurações do Claude Code entre sessões e rebuilds do container.
@@ -13,21 +12,26 @@
 
   // Variáveis de ambiente disponíveis no container.
   // ANTHROPIC_API_KEY é lida do ambiente do host — nunca commitada no repo.
+  // DATABASE_URL é injetada pelo docker-compose.yml.
   "remoteEnv": {
     "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}"
   },
 
-  // Porta do Next.js dev server
-  "forwardPorts": [3000],
+  // Porta do Next.js dev server e do PostgreSQL
+  "forwardPorts": [3000, 5432],
   "portsAttributes": {
     "3000": {
       "label": "Next.js",
       "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
     }
   },
 
-  // Instala dependências do monorepo após o container ser criado
-  "postCreateCommand": "pnpm install",
+  // Instala dependências e sincroniza schema com o banco após o container ser criado
+  "postCreateCommand": "pnpm install && pnpm --filter @cozap/web exec prisma db push",
 
   "customizations": {
     "vscode": {
@@ -40,7 +44,9 @@
         "eamodio.gitlens",
         "streetsidesoftware.code-spell-checker",
         "streetsidesoftware.code-spell-checker-portuguese-brazilian",
-        "bierner.markdown-mermaid"
+        "bierner.markdown-mermaid",
+        "cweijan.vscode-postgresql-client2",
+        "ms-azuretools.vscode-docker"
       ],
       "settings": {
         "editor.formatOnSave": true,
@@ -53,6 +59,10 @@
         "terminal.integrated.defaultProfile.linux": "bash"
       }
     }
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
 
   "remoteUser": "node"
