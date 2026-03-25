@@ -66,6 +66,11 @@ export default function HomePage() {
                 <div className="site-header__subtitle">Alumni Poli</div>
               </div>
             </div>
+            <nav className="site-header__nav">
+              <button className="btn btn--ghost btn--sm" onClick={logout} style={{ color: 'var(--color-text-inverse)' }}>
+                Sair
+              </button>
+            </nav>
           </div>
         </header>
         <main className="page-main">

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CredentialRequest } from '@cozap/core'
 import { useAuth } from '../../hooks/useAuth'
 import { CredentialRequestForm } from '../../components/CredentialRequestForm'
@@ -9,13 +9,15 @@ import { CredentialRequestForm } from '../../components/CredentialRequestForm'
 type PageState = 'auth' | 'form' | 'success'
 
 export default function SolicitarPage() {
-  const { isAuthenticated, address, login } = useAuth()
+  const { isAuthenticated, address, login, logout } = useAuth()
   const [pageState, setPageState] = useState<PageState>(isAuthenticated ? 'form' : 'auth')
   const [apiError, setApiError] = useState<string | null>(null)
 
-  if (isAuthenticated && pageState === 'auth') {
-    setPageState('form')
-  }
+  useEffect(() => {
+    if (isAuthenticated && pageState === 'auth') {
+      setPageState('form')
+    }
+  }, [isAuthenticated, pageState])
 
   async function handleSubmit(request: CredentialRequest) {
     setApiError(null)
@@ -45,6 +47,13 @@ export default function SolicitarPage() {
             <div className="site-header__subtitle">Alumni Poli</div>
           </div>
         </Link>
+        {isAuthenticated && (
+          <nav className="site-header__nav">
+            <button className="btn btn--ghost btn--sm" onClick={logout} style={{ color: 'var(--color-text-inverse)' }}>
+              Sair
+            </button>
+          </nav>
+        )}
       </div>
     </header>
   )
@@ -69,6 +78,19 @@ export default function SolicitarPage() {
                 Voltar ao início
               </Link>
             </div>
+          </div>
+        </main>
+      </>
+    )
+  }
+
+  if (pageState === 'form' && !address) {
+    return (
+      <>
+        {header}
+        <main className="page-main">
+          <div className="container container--narrow text-center">
+            <p className="text-muted">Carregando…</p>
           </div>
         </main>
       </>

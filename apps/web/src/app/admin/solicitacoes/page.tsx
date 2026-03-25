@@ -5,11 +5,13 @@ import { useEffect, useState } from 'react'
 import { CredentialRequest } from '@cozap/core'
 import { buildCredentialHash } from '@cozap/core'
 import { useAlumniSBT } from '../../../hooks/useAlumniSBT'
+import { useAuth } from '../../../hooks/useAuth'
 
 type ItemState = { rejectMode: boolean; error: string | null; loading: boolean }
 
 export default function SolicitacoesPage() {
   const { issueCredential } = useAlumniSBT()
+  const { logout } = useAuth()
   const [requests, setRequests] = useState<CredentialRequest[]>([])
   const [itemState, setItemState] = useState<Record<string, ItemState>>({})
   const [rejectReasons, setRejectReasons] = useState<Record<string, string>>({})
@@ -78,6 +80,9 @@ export default function SolicitacoesPage() {
             <span style={{ color: 'var(--color-gold-light)', fontSize: 'var(--text-sm)' }}>
               Painel Admin
             </span>
+            <button className="btn btn--ghost btn--sm" onClick={logout} style={{ color: 'var(--color-text-inverse)' }}>
+              Sair
+            </button>
           </nav>
         </div>
       </header>

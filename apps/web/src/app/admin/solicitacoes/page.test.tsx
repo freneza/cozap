@@ -8,6 +8,10 @@ vi.mock('../../../hooks/useAlumniSBT.js', () => ({
   useAlumniSBT: vi.fn(),
 }))
 
+vi.mock('../../../hooks/useAuth.js', () => ({
+  useAuth: vi.fn(() => ({ logout: vi.fn() })),
+}))
+
 const makePending = (id: string): CredentialRequest => ({
   id,
   walletAddress: `0xAlumni${id}` as `0x${string}`,
