@@ -14,6 +14,12 @@
 
 _Nenhuma tarefa em andamento._
 
+## Bugs conhecidos
+
+| # | Descrição | Prioridade |
+|---|---|---|
+| BUG-001 | ~~Página `/admin/solicitacoes` exibe aprovadas — repositório não persistia após aprovação~~ **Corrigido:** `updateStatus` aceitava apenas `'approved'\|'rejected'`, causando erro TypeScript que quebrava o handler PATCH inteiro. Corrigido junto com `findAll` (Prisma `exactOptionalPropertyTypes`) e `entryYear` opcional no core. | ✅ |
+
 ---
 
 ## Backlog priorizado
@@ -33,7 +39,7 @@ _Nenhuma tarefa em andamento._
 | US-008 | Alumni atualiza dados do perfil off-chain | 🟢 | `backlog` | M |
 | US-009 | Administrador adiciona outro administrador | 🟢 | `backlog` | P |
 | US-010 | Alumni silencia um membro específico em um canal | 🔴 | `backlog` | M |
-| US-019 | Administrador revoga SBT de membro em caso de fraude ou conduta grave | 🔴 | `backlog` | M |
+| US-019 | Administrador revoga SBT de membro em caso de fraude ou conduta grave | 🔴 | `done` | M |
 | US-020 | Alumni inclui evidência de formação (Lattes ou LinkedIn) na solicitação de credencial | 🟡 | `backlog` | P |
 | US-021 | Sistema detecta solicitações com dados de formação duplicados | 🟡 | `backlog` | P |
 | US-022 | Alumni verificado indica outro alumni como referência na solicitação | 🟢 | `backlog` | M |
@@ -56,6 +62,10 @@ _Nenhuma tarefa em andamento._
 | US-030 | Plataforma previne capturas de tela (screen security) | 🟢 | `backlog` | M |
 | US-031 | Alumni configura tempo de expiração de mensagens em um canal | 🟢 | `backlog` | M |
 | US-033 | 🥚 Easter egg: notificação especial para membros computação2002 | 🟢 | `backlog` | P |
+| US-034 | Administrador filtra membros verificados por nome, curso e período | 🟡 | `backlog` | P |
+| US-035 | Lista de membros exibe contagem de denúncias recebidas por cada membro | 🟡 | `backlog` | M |
+| US-036 | Membro é notificado quando seu SBT é revogado | 🟡 | `backlog` | M |
+| US-037 | Membro com SBT revogado recebe mensagem explicativa ao tentar fazer login | 🔴 | `backlog` | P |
 
 ---
 
@@ -501,6 +511,80 @@ _Nenhuma tarefa em andamento._
 
 ---
 
+## Detalhamento de US-034
+
+**Como** administrador,
+**quero** filtrar a lista de membros verificados por nome, curso e período de formação,
+**para que** eu consiga encontrar rapidamente o membro cujo acesso preciso revisar ou revogar.
+
+**Regras:**
+- Filtros disponíveis: nome (substring, case-insensitive), curso (substring), ano de conclusão
+- Filtros são combinados (AND) — aplicados localmente nos dados já carregados
+- Resultado atualizado em tempo real conforme o admin digita (sem recarregar a página)
+- Estado dos filtros não é persistido — resetam ao recarregar a página
+
+---
+
+## Detalhamento de US-035
+
+**Como** administrador,
+**quero** ver a contagem de denúncias recebidas por cada membro na lista de membros verificados,
+**para que** eu tenha contexto antes de decidir revogar um SBT.
+
+**Regras:**
+- Contagem exibida como badge no card do membro (ex: "3 denúncias")
+- Inclui apenas denúncias com status `nova` ou `em apuração` — denúncias `encerradas` não contam
+- Zero denúncias: badge não é exibido (para não poluir a interface)
+- Clicar no badge leva para o painel de denúncias filtrado pelo membro (US-015)
+- **Depende de:** US-014 (sistema de denúncias)
+
+---
+
+## Detalhamento de US-036
+
+**Como** membro,
+**quero** ser notificado quando meu SBT for revogado,
+**para que** eu entenda por que perdi o acesso à plataforma.
+
+**Canal 1 — Mensagem na plataforma (se ainda estiver conectado):**
+- Ao revogar, a plataforma publica uma mensagem direta criptografada (NIP-04) para o membro via Nostr
+- Mensagem inclui: motivo da revogação (se informado pelo admin) e orientação para contato
+
+**Canal 2 — Notificação por celular:**
+- Se o membro tiver número de celular cadastrado no perfil, envia SMS ou WhatsApp via provider externo (ex: Twilio, Z-API)
+- Conteúdo: mesmo da mensagem Nostr, em linguagem simples
+- Provider a definir na implementação — abstraído por interface `INotificationService`
+
+**Fora de escopo por ora:**
+- E-mail de notificação
+- Notificação push em app mobile
+
+**Depende de:** US-028 (perfil com dados de contato) para o canal 2
+
+---
+
+## Detalhamento de US-037
+
+**Como** membro com SBT revogado,
+**quero** receber uma mensagem clara ao tentar fazer login,
+**para que** eu entenda que meu acesso foi cancelado e como posso buscar esclarecimentos.
+
+**Regras:**
+- Ao concluir o login, o sistema verifica `hasCredential(address)` on-chain
+- Se `false` **e** o banco de dados indica que o membro já teve status `approved` anteriormente (ou seja, foi revogado, não está apenas pendente), exibe tela específica de acesso revogado
+- Tela exibe: mensagem de que o acesso foi suspenso, motivo (se registrado na revogação), canal de contato com a administração
+- Tela é distinta da tela "em análise" (alumni que solicitou mas ainda não foi aprovado)
+- Membro revogado **não tem acesso** à plataforma — não pode nem ver canais
+
+**Diferença entre estados:**
+- `pending` → "Solicitação em análise"
+- `approved` + `hasCredential = true` → acesso liberado
+- `approved` + `hasCredential = false` → **estado impossível em operação normal**
+- `revoked` → "Acesso suspenso" (esta US)
+- sem solicitação → tela de login/solicitar
+
+---
+
 ## Notas de iteração
 
 - **2026-03-17**: Backlog reordenado para refletir fluxo real de uso. Adicionada
@@ -531,6 +615,12 @@ _Nenhuma tarefa em andamento._
   proveniência (US-018).
 - **2026-03-22**: US-019 a US-022 adicionadas — mecanismos anti-perfil-falso: revogação
   de SBT (🔴 alta prioridade), evidência de formação, detecção de duplicatas e vouching.
+- **2026-03-26**: US-019 concluída — `revokeCredential` no contrato AlumniSBT, hook
+  `useAlumniSBT`, rotas API com `action: revoke` e página `/admin/membros`. BUG-001
+  corrigido: assinatura de `updateStatus` e `findAll` no Prisma. US-034 a US-037
+  adicionadas — melhorias no fluxo de revogação: filtros, contagem de denúncias,
+  notificação ao membro e tela de acesso suspenso no login.
+  161 testes totais (27 contracts + 36 core + 98 web).
 - **2026-03-25**: US-023 a US-032 adicionadas — funcionalidades de mensageria básica
   inspiradas no Signal como referência de app de mensagens: reações, busca, mensagens
   fixadas, silêncio de canal, bloqueio de membro, perfil social, tag de membro no grupo,

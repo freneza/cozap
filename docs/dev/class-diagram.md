@@ -142,6 +142,7 @@ classDiagram
   class useAlumniSBT {
     <<hook>>
     +issueCredential(to, hash) Promise~string~
+    +revokeCredential(member) Promise~string~
     +boolean isLoading
     +string|null error
   }
@@ -207,11 +208,19 @@ classDiagram
     -ICredentialRequestRepository
   }
 
+  class MembrosPage {
+    <<page /admin/membros>>
+    -useAlumniSBT
+    -ICredentialRequestRepository
+  }
+
   CredentialRequestForm ..> buildCredentialRequest : valida
   SolicitarPage --> CredentialRequestForm
   SolicitarPage ..> ICredentialRequestRepository : POST API
   SolicitacoesPage ..> ICredentialRequestRepository : GET/PATCH API
   SolicitacoesPage ..> buildCredentialHash : antes de emitir SBT
+  MembrosPage ..> ICredentialRequestRepository : GET/PATCH API
+  MembrosPage ..> useAlumniSBT : revokeCredential
   HomePage --> useAuth
   HomePage --> useHasCredential
   ComunidadePage --> useAuth
@@ -233,8 +242,21 @@ classDiagram
     +addAdmin(address) onlyOwner
     +removeAdmin(address) onlyOwner
     +issueCredential(address, bytes32) onlyAdmin uint256
+    +revokeCredential(address) onlyAdmin
     +hasCredential(address) view bool
     +tokenOf(address) view uint256
     +ownerOf(uint256) view address
+    event CredentialRevoked(address member, address revokedBy)
   }
+
+  %% ───────────────────────────────
+  %% LEGENDA DE REVISÃO (remover após aceite)
+  %% 🟡 amarelo = classe modificada nesta US
+  %% 🟢 verde   = classe nova nesta US
+  %% 🔴 vermelho = classe/elemento removido (nenhum nesta US)
+  %% ───────────────────────────────
+  classDef modified fill:#ffe066,stroke:#b8860b,color:#000
+  classDef added    fill:#90ee90,stroke:#2e7d32,color:#000
+  classDef removed  fill:#ff6b6b,stroke:#b71c1c,color:#000
+
 ```

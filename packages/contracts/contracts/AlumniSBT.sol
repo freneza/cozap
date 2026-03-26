@@ -18,6 +18,7 @@ contract AlumniSBT {
     // -------------------------------------------------------------------------
 
     event CredentialIssued(address indexed to, uint256 indexed tokenId, address indexed issuedBy);
+    event CredentialRevoked(address indexed member, address indexed revokedBy);
     event AdminAdded(address indexed admin);
     event AdminRemoved(address indexed admin);
 
@@ -27,6 +28,7 @@ contract AlumniSBT {
 
     error NotAdmin();
     error AlreadyHasCredential();
+    error NoCredential();
     error Soulbound();
     error ZeroAddress();
 
@@ -113,6 +115,25 @@ contract AlumniSBT {
 
         emit CredentialIssued(to, tokenId, msg.sender);
         return tokenId;
+    }
+
+    // -------------------------------------------------------------------------
+    // Revogação de credencial
+    // -------------------------------------------------------------------------
+
+    /**
+     * @notice Revoga o SBT de um membro. Irreversível — para reintegrar,
+     *         o membro deve solicitar nova credencial.
+     * @param member Endereço Ethereum do membro a ter a credencial revogada.
+     */
+    function revokeCredential(address member) external onlyAdmin {
+        uint256 tokenId = _tokenOf[member];
+        if (tokenId == 0) revert NoCredential();
+
+        delete _ownerOf[tokenId];
+        delete _tokenOf[member];
+
+        emit CredentialRevoked(member, msg.sender);
     }
 
     // -------------------------------------------------------------------------

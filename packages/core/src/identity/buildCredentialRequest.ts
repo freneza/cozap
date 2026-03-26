@@ -9,7 +9,7 @@ export function buildCredentialRequest(
     throw new InvalidRequestData('fullName não pode ser vazio')
   }
 
-  if (data.entryYear >= data.graduationYear) {
+  if (data.entryYear !== undefined && data.entryYear >= data.graduationYear) {
     throw new InvalidRequestData('entryYear deve ser menor que graduationYear')
   }
 

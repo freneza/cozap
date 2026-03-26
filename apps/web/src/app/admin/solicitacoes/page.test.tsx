@@ -30,6 +30,7 @@ beforeEach(async () => {
   const { useAlumniSBT } = await import('../../../hooks/useAlumniSBT.js')
   vi.mocked(useAlumniSBT).mockReturnValue({
     issueCredential: vi.fn().mockResolvedValue('0xtx'),
+    revokeCredential: vi.fn(),
     isLoading: false,
     error: null,
   })
@@ -58,7 +59,7 @@ describe('SolicitacoesPage', () => {
 
     const { useAlumniSBT } = await import('../../../hooks/useAlumniSBT.js')
     const issueCredential = vi.fn().mockResolvedValue('0xtx')
-    vi.mocked(useAlumniSBT).mockReturnValue({ issueCredential, isLoading: false, error: null })
+    vi.mocked(useAlumniSBT).mockReturnValue({ issueCredential, revokeCredential: vi.fn(), isLoading: false, error: null })
 
     const user = userEvent.setup()
     render(<SolicitacoesPage />)
@@ -162,6 +163,7 @@ describe('SolicitacoesPage', () => {
     const { useAlumniSBT } = await import('../../../hooks/useAlumniSBT.js')
     vi.mocked(useAlumniSBT).mockReturnValue({
       issueCredential: vi.fn().mockRejectedValue(new Error('Sem gas')),
+      revokeCredential: vi.fn(),
       isLoading: false,
       error: null,
     })
@@ -184,6 +186,7 @@ describe('SolicitacoesPage', () => {
     const { useAlumniSBT } = await import('../../../hooks/useAlumniSBT.js')
     vi.mocked(useAlumniSBT).mockReturnValue({
       issueCredential: vi.fn().mockRejectedValue('falha estranha'),
+      revokeCredential: vi.fn(),
       isLoading: false,
       error: null,
     })

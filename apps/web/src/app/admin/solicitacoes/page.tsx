@@ -77,8 +77,14 @@ export default function SolicitacoesPage() {
             </div>
           </Link>
           <nav className="site-header__nav">
+            <Link
+              href="/admin/membros"
+              style={{ color: 'var(--color-gold-light)', fontSize: 'var(--text-sm)' }}
+            >
+              Membros
+            </Link>
             <span style={{ color: 'var(--color-gold-light)', fontSize: 'var(--text-sm)' }}>
-              Painel Admin
+              Solicitações
             </span>
             <button className="btn btn--ghost btn--sm" onClick={logout} style={{ color: 'var(--color-text-inverse)' }}>
               Sair

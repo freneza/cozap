@@ -7,6 +7,7 @@ import { useWeb3Auth } from '@web3auth/modal-react-hooks'
 
 const ABI = parseAbi([
   'function issueCredential(address to, bytes32 credentialHash) external returns (uint256)',
+  'function revokeCredential(address member) external',
 ])
 
 function getContractAddress(): `0x${string}` {
@@ -17,6 +18,7 @@ function getContractAddress(): `0x${string}` {
 
 type UseAlumniSBTResult = {
   issueCredential(to: `0x${string}`, hash: `0x${string}`): Promise<`0x${string}`>
+  revokeCredential(member: `0x${string}`): Promise<`0x${string}`>
   isLoading: boolean
   error: string | null
 }
@@ -63,5 +65,42 @@ export function useAlumniSBT(): UseAlumniSBTResult {
     }
   }
 
-  return { issueCredential, isLoading, error }
+  async function revokeCredential(member: `0x${string}`): Promise<`0x${string}`> {
+    if (!provider) throw new Error('Carteira não conectada')
+    const CONTRACT_ADDRESS = getContractAddress()
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const walletClient = createWalletClient({
+        chain: polygonAmoy,
+        transport: custom(provider),
+      })
+
+      const [account] = await walletClient.getAddresses()
+      if (!account) throw new Error('Nenhuma conta disponível')
+
+      const txHash = await walletClient.writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: ABI,
+        functionName: 'revokeCredential',
+        args: [member],
+        account,
+        gas: 300_000n,
+        maxFeePerGas: parseGwei('100'),
+        maxPriorityFeePerGas: parseGwei('30'),
+      })
+
+      return txHash
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro ao revogar credencial'
+      setError(message)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return { issueCredential, revokeCredential, isLoading, error }
 }

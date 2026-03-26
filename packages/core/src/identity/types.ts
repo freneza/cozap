@@ -36,7 +36,7 @@ export interface CredentialRequestData {
   fullName: string
   course: string
   degreeType: 'graduation' | 'masters' | 'doctorate'
-  entryYear: number
+  entryYear?: number
   graduationYear: number
 }
 
@@ -47,7 +47,7 @@ export interface CredentialRequestData {
 export interface CredentialRequest {
   id: string
   walletAddress: `0x${string}`
-  status: 'pending' | 'approved' | 'rejected'
+  status: 'pending' | 'approved' | 'rejected' | 'revoked'
   requestedAt: number
   data: CredentialRequestData
   rejectionReason?: string

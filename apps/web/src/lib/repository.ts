@@ -8,7 +8,7 @@ export interface ICredentialRequestRepository {
   findById(id: string): Promise<CredentialRequest | null>
   updateStatus(
     id: string,
-    status: 'approved' | 'rejected',
+    status: 'approved' | 'rejected' | 'revoked',
     rejectionReason?: string,
   ): Promise<CredentialRequest | null>
 }
@@ -35,7 +35,7 @@ export class InMemoryCredentialRequestRepository implements ICredentialRequestRe
 
   async updateStatus(
     id: string,
-    status: 'approved' | 'rejected',
+    status: 'approved' | 'rejected' | 'revoked',
     rejectionReason?: string,
   ): Promise<CredentialRequest | null> {
     const request = this.store.get(id)
@@ -74,18 +74,20 @@ function buildDedupHash(course: string, degreeType: string, graduationYear: numb
 }
 
 function rowToCredentialRequest(row: CredentialRequestRow): CredentialRequest {
+  const data: CredentialRequest['data'] = {
+    fullName: row.fullName,
+    course: row.course,
+    degreeType: row.degreeType as 'graduation' | 'masters' | 'doctorate',
+    graduationYear: row.graduationYear,
+  }
+  if (row.entryYear !== null) data.entryYear = row.entryYear
+
   return {
     id: row.id,
     walletAddress: row.walletAddress as `0x${string}`,
     status: row.status as CredentialRequest['status'],
     requestedAt: row.requestedAt.getTime(),
-    data: {
-      fullName: row.fullName,
-      course: row.course,
-      degreeType: row.degreeType as 'graduation' | 'masters' | 'doctorate',
-      entryYear: row.entryYear ?? undefined,
-      graduationYear: row.graduationYear,
-    },
+    data,
     ...(row.rejectionReason ? { rejectionReason: row.rejectionReason } : {}),
   }
 }
@@ -113,7 +115,7 @@ export class PrismaCredentialRequestRepository implements ICredentialRequestRepo
 
   async findAll(status?: CredentialRequest['status']): Promise<CredentialRequest[]> {
     const rows = await prisma.credentialRequest.findMany({
-      where: status ? { status } : undefined,
+      ...(status ? { where: { status } } : {}),
       orderBy: { requestedAt: 'desc' },
     })
     return rows.map(rowToCredentialRequest)
@@ -126,7 +128,7 @@ export class PrismaCredentialRequestRepository implements ICredentialRequestRepo
 
   async updateStatus(
     id: string,
-    status: 'approved' | 'rejected',
+    status: 'approved' | 'rejected' | 'revoked',
     rejectionReason?: string,
   ): Promise<CredentialRequest | null> {
     const existing = await prisma.credentialRequest.findUnique({ where: { id } })

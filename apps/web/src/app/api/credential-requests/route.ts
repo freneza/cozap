@@ -4,7 +4,7 @@ import { getRepository } from '../../../lib/repository'
 
 export async function GET(request: NextRequest) {
   const status = request.nextUrl.searchParams.get('status') as CredentialRequest['status'] | null
-  const validStatuses: CredentialRequest['status'][] = ['pending', 'approved', 'rejected']
+  const validStatuses: CredentialRequest['status'][] = ['pending', 'approved', 'rejected', 'revoked']
 
   if (status && !validStatuses.includes(status)) {
     return NextResponse.json({ error: 'Status inválido' }, { status: 400 })

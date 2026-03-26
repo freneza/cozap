@@ -174,4 +174,68 @@ describe('useAlumniSBT', () => {
 
     expect(result.current.error).toBe('Erro ao emitir credencial')
   })
+
+  describe('revokeCredential', () => {
+    it('chama writeContract com functionName revokeCredential e args corretos', async () => {
+      const mockWrite = vi.fn().mockResolvedValue(mockTxHash)
+      mockWalletClient(mockWrite)
+
+      const { result } = renderHook(() => useAlumniSBT())
+      let txHash: `0x${string}` | undefined
+
+      await act(async () => {
+        txHash = await result.current.revokeCredential('0xMember1234' as `0x${string}`)
+      })
+
+      expect(txHash).toBe(mockTxHash)
+      expect(mockWrite).toHaveBeenCalledWith(
+        expect.objectContaining({
+          functionName: 'revokeCredential',
+          args: ['0xMember1234'],
+        }),
+      )
+    })
+
+    it('isLoading é false após conclusão da revogação', async () => {
+      const { result } = renderHook(() => useAlumniSBT())
+
+      await act(async () => {
+        await result.current.revokeCredential('0xMember1234' as `0x${string}`)
+      })
+
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    it('error é preenchido se revokeCredential falhar', async () => {
+      mockWalletClient(vi.fn().mockRejectedValue(new Error('Membro sem credencial')))
+
+      const { result } = renderHook(() => useAlumniSBT())
+
+      await act(async () => {
+        try {
+          await result.current.revokeCredential('0xMember1234' as `0x${string}`)
+        } catch {
+          // esperado
+        }
+      })
+
+      expect(result.current.error).toBe('Membro sem credencial')
+    })
+
+    it('error usa mensagem genérica quando erro não é instância de Error', async () => {
+      mockWalletClient(vi.fn().mockRejectedValue('falha desconhecida'))
+
+      const { result } = renderHook(() => useAlumniSBT())
+
+      await act(async () => {
+        try {
+          await result.current.revokeCredential('0xMember1234' as `0x${string}`)
+        } catch {
+          // esperado
+        }
+      })
+
+      expect(result.current.error).toBe('Erro ao revogar credencial')
+    })
+  })
 })

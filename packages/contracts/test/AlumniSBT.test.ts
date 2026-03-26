@@ -134,6 +134,52 @@ describe('AlumniSBT', function () {
     })
   })
 
+  describe('revokeCredential', function () {
+    beforeEach(async function () {
+      await contract.issueCredential(member.address, credentialHash)
+    })
+
+    it('admin revoga credencial e emite CredentialRevoked', async function () {
+      await expect(contract.revokeCredential(member.address))
+        .to.emit(contract, 'CredentialRevoked')
+        .withArgs(member.address, owner.address)
+    })
+
+    it('hasCredential retorna false após revogação', async function () {
+      await contract.revokeCredential(member.address)
+      expect(await contract.hasCredential(member.address)).to.be.false
+    })
+
+    it('tokenOf retorna 0 após revogação', async function () {
+      await contract.revokeCredential(member.address)
+      expect(await contract.tokenOf(member.address)).to.equal(0n)
+    })
+
+    it('ownerOf retorna endereço zero após revogação', async function () {
+      await contract.revokeCredential(member.address)
+      expect(await contract.ownerOf(1n)).to.equal(ethers.ZeroAddress)
+    })
+
+    it('não-admin não pode revogar', async function () {
+      await expect(
+        contract.connect(other).revokeCredential(member.address),
+      ).to.be.revertedWithCustomError(contract, 'NotAdmin')
+    })
+
+    it('reverte NoCredential se membro não possui SBT', async function () {
+      await expect(
+        contract.revokeCredential(other.address),
+      ).to.be.revertedWithCustomError(contract, 'NoCredential')
+    })
+
+    it('após revogação issueCredential pode ser emitido novamente para o mesmo endereço', async function () {
+      await contract.revokeCredential(member.address)
+      await expect(
+        contract.issueCredential(member.address, credentialHash),
+      ).to.emit(contract, 'CredentialIssued')
+    })
+  })
+
   describe('soulbound', function () {
     it('transfer reverte com Soulbound', async function () {
       await expect(contract.transfer(other.address, 1n)).to.be.revertedWithCustomError(
