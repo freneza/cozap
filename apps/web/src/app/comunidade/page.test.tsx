@@ -10,7 +10,7 @@ vi.mock('../../hooks/useNostrIdentity.js', () => ({ useNostrIdentity: vi.fn() })
 vi.mock('../../hooks/useChannelMessages.js', () => ({ useChannelMessages: vi.fn() }))
 vi.mock('../../hooks/useSendMessage.js', () => ({ useSendMessage: vi.fn() }))
 
-const mockRouter = { replace: vi.fn() }
+const mockRouter = { replace: vi.fn(), push: vi.fn(), back: vi.fn(), forward: vi.fn(), refresh: vi.fn(), prefetch: vi.fn() }
 const mockSendMessage = vi.fn()
 
 async function setup(opts: {

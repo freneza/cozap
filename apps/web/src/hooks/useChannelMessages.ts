@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { SimplePool } from 'nostr-tools'
+import type { Filter } from 'nostr-tools'
 import type { ChannelMessage } from '@cozap/core'
 
 type UseChannelMessagesResult = {
@@ -23,7 +24,7 @@ export function useChannelMessages(
 
     const sub = pool.subscribeMany(
       relayUrls,
-      [{ kinds: [42], '#e': [channelId], limit: 50 }],
+      { kinds: [42], '#e': [channelId], limit: 50 } as Filter,
       {
         onevent(event) {
           const msg: ChannelMessage = {

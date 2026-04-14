@@ -1,4 +1,5 @@
 import { WEB3AUTH_NETWORK } from '@web3auth/base'
+import type { IAdapter } from '@web3auth/base'
 import { EthereumPrivateKeyProvider } from '@web3auth/ethereum-provider'
 import { Web3AuthOptions } from '@web3auth/modal'
 import { Web3AuthContextConfig } from '@web3auth/modal-react-hooks'
@@ -35,5 +36,5 @@ const metamaskAdapter = new MetamaskAdapter({
 
 export const web3AuthConfig: Web3AuthContextConfig = {
   web3AuthOptions,
-  adapters: [metamaskAdapter],
+  adapters: [metamaskAdapter as unknown as IAdapter<unknown>],
 }

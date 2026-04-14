@@ -74,7 +74,7 @@ describe('PATCH /api/credential-requests/:id — action revoke', () => {
       updateStatus: vi.fn(),
     })
 
-    const res = await PATCH(makePatchRequest({ action: 'revoke' }), { params: { id: 'inexistente' } })
+    const res = await PATCH(makePatchRequest({ action: 'revoke' }), { params: Promise.resolve({ id: 'inexistente' }) })
     expect(res.status).toBe(404)
   })
 

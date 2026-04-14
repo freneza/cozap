@@ -91,7 +91,7 @@ describe('useChannelMessages', () => {
     })
 
     expect(result.current.messages).toHaveLength(1)
-    expect(result.current.messages[0].content).toBe('Olá, comunidade!')
+    expect(result.current.messages[0]!.content).toBe('Olá, comunidade!')
   })
 
   it('mensagens são ordenadas por createdAt crescente', async () => {
@@ -106,8 +106,8 @@ describe('useChannelMessages', () => {
       triggerEvent(makeEvent({ id: 'e1', created_at: 1700000001, content: 'Primeira' }))
     })
 
-    expect(result.current.messages[0].content).toBe('Primeira')
-    expect(result.current.messages[1].content).toBe('Segunda')
+    expect(result.current.messages[0]!.content).toBe('Primeira')
+    expect(result.current.messages[1]!.content).toBe('Segunda')
   })
 
   it('chama subscribeMany com filtro kind 42 e channelId correto', () => {
@@ -117,12 +117,10 @@ describe('useChannelMessages', () => {
 
     expect(pool.subscribeMany).toHaveBeenCalledWith(
       RELAY_URLS,
-      expect.arrayContaining([
-        expect.objectContaining({
-          kinds: [42],
-          '#e': [CHANNEL_ID],
-        }),
-      ]),
+      expect.objectContaining({
+        kinds: [42],
+        '#e': [CHANNEL_ID],
+      }),
       expect.objectContaining({ onevent: expect.any(Function) }),
     )
   })
@@ -145,7 +143,7 @@ describe('useChannelMessages', () => {
       )
     })
 
-    const msg = result.current.messages[0]
+    const msg = result.current.messages[0]!
     expect(msg.id).toBe('eventX')
     expect(msg.authorPubkey).toBe('pubkeyX')
     expect(msg.channelId).toBe(CHANNEL_ID)

@@ -24,7 +24,7 @@ function makePool(publishResult: Promise<unknown> = Promise.resolve('ok')) {
 
 beforeEach(() => {
   makePool()
-  vi.mocked(finalizeEvent).mockReturnValue(MOCK_EVENT as ReturnType<typeof finalizeEvent>)
+  vi.mocked(finalizeEvent).mockReturnValue(MOCK_EVENT as unknown as ReturnType<typeof finalizeEvent>)
 })
 
 describe('useSendMessage', () => {

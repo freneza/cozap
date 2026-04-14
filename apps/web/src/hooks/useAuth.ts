@@ -24,7 +24,7 @@ export function useAuth(): UseAuthResult {
     }
 
     provider
-      .request<string[]>({ method: 'eth_accounts' })
+      .request<unknown, string[]>({ method: 'eth_accounts' })
       .then((accounts) => {
         setAddress(accounts?.[0] as `0x${string}` | undefined)
       })
