@@ -9,6 +9,8 @@ dist/
 .next/
 out/
 build/
+next-env.d.ts
+tsconfig.tsbuildinfo
 
 # Hardhat / Solidity
 artifacts/
