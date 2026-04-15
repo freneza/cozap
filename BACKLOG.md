@@ -66,6 +66,7 @@ _Nenhuma tarefa em andamento._
 | US-035 | Lista de membros exibe contagem de denúncias recebidas por cada membro | 🟡 | `backlog` | M |
 | US-036 | Membro é notificado quando seu SBT é revogado | 🟡 | `backlog` | M |
 | US-037 | Membro com SBT revogado recebe mensagem explicativa ao tentar fazer login | 🔴 | `backlog` | P |
+| US-038 | Administrador configura limite de mensagens por usuário em um grupo | 🟡 | `backlog` | M |
 
 ---
 
@@ -585,6 +586,31 @@ _Nenhuma tarefa em andamento._
 
 ---
 
+## Detalhamento de US-038
+
+**Como** administrador,
+**quero** configurar o número máximo de mensagens que um usuário pode enviar em um período de tempo em um grupo,
+**para que** mensagens excessivas ou inadequadas sejam contidas sem precisar silenciar o membro manualmente.
+
+**Regras:**
+- Configuração por grupo: `maxMessages` (número inteiro positivo) + `windowSeconds` (período em segundos)
+  - Exemplos: 5 mensagens em 600s (10 min) para "Games"; 5 mensagens em 3600s (1h) para "Networking"
+- Quando o limite é atingido, o cliente bloqueia o envio e exibe aviso ao membro (ex: "Você atingiu o limite de 5 mensagens nos últimos 10 minutos")
+- Controle é aplicado **no cliente** (sem acesso a relay externo) — membro com cliente malicioso pode contornar; o controle é social/preventivo, não criptográfico
+- Contagem é local por sessão e resetada após o `windowSeconds` a partir da primeira mensagem da janela
+- Admin pode desativar o limite a qualquer momento (definir como "ilimitado")
+- Configuração armazenada off-chain junto às demais configurações do grupo
+- Alumni vê indicador visual no canal quando um limite está ativo (ex: "Limite: 5 msg / 10 min")
+
+**Fora de escopo por ora:**
+- Limite diferenciado por papel de membro (ex: moderadores sem limite)
+- Histórico de membros que atingiram o limite
+- Escalada automática (ex: silenciar após N violações)
+
+**Depende de:** US-032 (modelo de grupo com controles de admin)
+
+---
+
 ## Notas de iteração
 
 - **2026-03-17**: Backlog reordenado para refletir fluxo real de uso. Adicionada
@@ -621,6 +647,8 @@ _Nenhuma tarefa em andamento._
   adicionadas — melhorias no fluxo de revogação: filtros, contagem de denúncias,
   notificação ao membro e tela de acesso suspenso no login.
   161 testes totais (27 contracts + 36 core + 98 web).
+- **2026-04-15**: US-038 adicionada — limite de mensagens por usuário configurável pelo admin por grupo
+  (maxMessages + windowSeconds). Controle preventivo no cliente, sem dependência de relay.
 - **2026-03-25**: US-023 a US-032 adicionadas — funcionalidades de mensageria básica
   inspiradas no Signal como referência de app de mensagens: reações, busca, mensagens
   fixadas, silêncio de canal, bloqueio de membro, perfil social, tag de membro no grupo,
