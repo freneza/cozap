@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "coZap",
+  "project_id": "331527d8-24ec-488d-aabc-22ebde5f65c4"
+}
